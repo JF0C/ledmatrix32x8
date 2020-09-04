@@ -1,0 +1,62 @@
+<html>
+<head>
+	<script type="text/javascript" src="./jquery-3.3.1.min.js"></script>
+	<script type="text/javascript" src="./svgbrush.js"></script>
+	<script type="text/javascript" src="./logic.js"></script>
+	<link rel="stylesheet" href="./style.css">
+	<meta name="viewport" content="width=device-width, user-scalable=no" />
+</head>
+<body>
+	<h1>led matrix</h1>
+	<!-- TEXT -->
+	<div class="appsheader" style="margin-top: -5px;">text:</div>
+	<input id="text-input" class="text-input" type=text/>
+	<div class="send-btn" id="send-text">&nbsp_></div>
+	<div id="brightness" class="slider-container">
+		<div class="slider-name">Brightness:</div>
+		<input id="brightness-slider" type="range" min=0 max=100 class="intens-slider"/>
+	</div>
+	<div id="velocity" class="slider-container">
+		<div class="slider-name">Velocity:</div>
+		<input id="velocity-slider" type="range" min=-150 max=150 class="intens-slider"/>
+	</div>
+	<div>Last Prompts:</div>
+	<div id="last-words"></div>
+
+	<!-- BACKGROUND -->
+	<div class="appsheader">background:</div>
+	<div id="bg-controls">
+		<div class="slider-container">
+			<div class="control-label">r:</div>
+			<input class="paint-control" type="range" min="0" max="255" id="red">
+		</div>
+		<div class="slider-container">
+			<div class="control-label">g:</div>
+			<input class="paint-control" type="range" min="0" max="255" id="green">
+		</div>
+		<div class="slider-container">
+			<div class="control-label">b:</div>
+			<input class="paint-control" type="range" min="0" max="255" id="blue">
+		</div>
+		<div class="slider-container">
+			<div class="control-label">i:</div>
+			<input class="paint-control" type="range" min="0" max="100" id="bgbright">
+		</div>
+	</div>
+	<div id="brush"></div>
+	<div id="bg-buttons">
+		<div class="btn" id="set-bg-col">set color</div>
+		<div class="btn" id="sel-paint">select painting</div>
+		<div class="btn" id="bg-off">off</div>
+	</div>
+	<div id="file-list"></div>
+
+	<!-- APPS -->
+	<div class="appsheader">apps:</div>
+	<div><a id="pong" href="/pong.html">Pong</a></div>
+	<div><a id="paint" href="/paint.html">paint</a></div>
+	<div><a id="help" href="/help.html">help</a></div>
+
+
+</body>
+</html>

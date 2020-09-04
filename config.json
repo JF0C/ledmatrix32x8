@@ -1,0 +1,16 @@
+{
+"bright":"0.10",
+"velocity":"-4.1",
+"text":"hello",
+"lasttexts":"[\"hello\"]",
+"bgbright":"0.22",
+"background":"<color>",
+"bgr":"92",
+"bgg":"72",
+"bgb":"29",
+"paintr": "123",
+"paintg": "123",
+"paintb": "123",
+"painthard": "20",
+"paintsize": "20"
+}
