@@ -84,7 +84,7 @@ void loop() {
   server.handleClient();
   FastLED.show();
   //Serial.println("cycle: " + String(dt));
-  delay(5);
+  delay(1);
 }
 
 void displayText(){
@@ -122,6 +122,7 @@ int printString(String text, int offset, int len){
   uint8_t color[3];
   colcp(&white[0], &color[0]);
   uint8_t twinklebatch = 0;
+  uint8_t dropbatch = 0;
   int k = 0;
   bool pulse = false;
   uint8_t rotate = 0;
@@ -188,6 +189,8 @@ int printString(String text, int offset, int len){
       offset += kissing(offset + pos, 1, color, getBright(pulse))+1;
     else if(ismarkup(l-k, &k, "<twinkling>", text.substring(k)))
       twinkling(color, getBright(pulse), twinklebatch++);
+    else if(ismarkup(l-k, &k, "<dripping>", text.substring(k)))
+      dripping(color, getBright(pulse), dropbatch++);
     else if(ismarkup(l-k, &k, "<rotx>", text.substring(k)))
       rotate = 1;
     else if(ismarkup(l-k, &k, "<roty>", text.substring(k)))

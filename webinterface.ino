@@ -27,6 +27,7 @@ void InitWeb(){
   server.on("/set", HTTP_POST, handleset);
   server.on("/set", HTTP_GET, readtext);
   server.on("/conf", HTTP_GET, showconfig);
+  server.on("/framerate", HTTP_GET, handleframerate);
   server.on("/paint", HTTP_POST, handlepaint);
   server.on("/debugscreen", HTTP_GET, sendscreen);
   server.on("/listfiles", HTTP_GET, listfiles);
@@ -293,4 +294,8 @@ void sendscreen(){
     data += String(s1[k].r) + "," + String(s1[k].g) + "," + String(s1[k].b) + ",";
   }
   server.send(200, "text/plain", data);
+}
+
+void handleframerate(){
+  server.send(200, "text/plain", String((float)1000.0/dt));
 }
