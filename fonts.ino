@@ -160,6 +160,15 @@ float tum4[5][8] = {{.0, .9, .9, .9, .9, .9, .9, .0},
                     {.0, .9, .9, .9, .9, .9, .9, .0},
                     {.0, .9, .9, .9, .9, .9, .9, .0}};
 
+float RICH[8][8] = {{.0, .9, .9, .9, .9, .9, .9, .0},
+                    {.0, .0, .0, .9, .0, .0, .0, .0},
+                    {.0, .0, .0, .9, .0, .0, .0, .0},
+                    {.9, .9, .9, .9, .9, .9, .9, .9},
+                    {.0, .9, .0, .9, .9, .0, .0, .0},
+                    {.0, .9, .0, .9, .0, .9, .0, .0},
+                    {.0, .0, .9, .0, .0, .0, .9, .0},
+                    {.0, .0, .0, .0, .0, .0, .0, .0}};
+
 float letter_space[2][8] = {{.0, .0, .0, .0, .0, .0, .0, .0},
                             {.0, .0, .0, .0, .0, .0, .0, .0}};
 
@@ -954,54 +963,118 @@ int letter(float dx, float dy, uint8_t* color, float f, String letter){
   return width;
 }
 
-int smiley(float dx, float dy, uint8_t* color, float f, String emoji){
+void rotateemoji(float* arr, uint8_t rotate){
+  if(rotate == 0) return;
+  float buff[8][8];
+  for(uint8_t x = 0; x < 8; x++){
+    for(uint8_t y = 0; y < 8; y++){
+      buff[x][y] = 0.0;
+    }
+  }
+  float fx = 1.0;
+  float fy = 1.0;
+  float corrx = -0.1;
+  float corry = -0.1;
+  // x-axis
+  if(rotate & (uint8_t)1){
+    fx = sin((float)t/1000*3.1416);
+    if(fx > 0) corrx = 0.1;
+  }
+  // y-axis
+  if(rotate & (uint8_t)2){
+    fy = sin((float)t/1000*3.1416);
+    if(fy > 0) corry = 0.1;
+  }
+  //Serial.println("sin: " + String(f));
+  if(rotate & (uint8_t)2 || rotate & (uint8_t)1){
+    for(uint8_t y = 0; y < 8; y++){
+      for(uint8_t x = 0; x < 8; x++){
+        float v[2] = {fx*((float)x - 3.5), fy*((float)y - 3.5)};
+        put_anti_ali(3.5 + v[0] + corrx, 3.5 + v[1] + corry, arr[x + 8*y], &buff[0][0], false);
+        //if(x == 0 && y == 0) Serial.println("v = (" + String(v[0]) + "," + String(v[1]) + ")");
+      }
+    }
+  }
+  if(rotate & (uint8_t)4){
+    float s = sin((float)t/1000*3.1416*0.25);
+    float c = cos((float)t/1000*3.1416*0.25);
+    for(uint8_t y = 0; y < 8; y++){
+      for(uint8_t x = 0; x < 8; x++){
+        float v[2] = {c*((float)x - 3.5) - s*((float)y - 3.5), s*((float)x - 3.5) + c*((float)y - 3.5)};
+        put_anti_ali(3.5 + v[0], 3.5 + v[1], arr[x + 8*y], &buff[0][0], true);
+      }
+    }
+  }
+  arrcp(&buff[0][0], arr, 64);
+}
+
+void put_anti_ali(float x, float y, float val, float* arr, bool quadratic){
+  int nx = floor(x);
+  int ny = floor(y);
+  float fx = x - (float)nx;
+  float fy = y - (float)ny;
+  float f00, f01, f10, f11;
+  f00 = (1.0-fx)*(1.0-fy);//*(1.0-fx)*(1.0-fy);
+  f10 = (1.0-fy)*fx;//*(1.0-fy)*fx;
+  f01 = (1.0-fx)*fy;//*(1.0-fx)*fy;
+  f11 = fx*fx;//*fy*fy;
+  if(quadratic){
+    f00 *= f00;
+    f10 *= f10;
+    f01 *= f01;
+    f11 *= f11;
+  }
+  uint8_t p1, p2, p3, p4;
+  /*
+  p1 = nx*8 + ny;
+  p2 = (nx+1)*8 + ny;
+  p3 = nx*8 + (ny+1);
+  p4 = (nx+1)*8 + (ny+1);
+  */
+  
+  p1 = nx + ny*8;
+  p2 = nx+1 + ny*8;
+  p3 = nx + (ny+1)*8;
+  p4 = nx+1 + (ny+1)*8;
+
+  if(p1 < 64 && p1 >= 0){
+    arr[p1] += (1.0-arr[p1])*f00*val;
+    arr[p1] = min(arr[p1], (float)1.0);
+  }
+  if(p2 < 64 && p2 >= 0) {
+    arr[p2] += (1.0-arr[p2])*f10*val;
+    arr[p2] = min(arr[p2], (float)1.0);
+  }
+  if(p3 < 64 && p3 >= 0){
+    arr[p3] += (1.0-arr[p3])*f01*val;
+    arr[p3] = min(arr[p3], (float)1.0);
+  }
+  if(p4 < 64 && p4 >= 0){
+    arr[p4] += (1.0-arr[p4])*f11*val;
+    arr[p4] = min(arr[p4], (float)1.0);
+  }
+}
+
+int smiley(float dx, float dy, uint8_t* color, float f, String emoji, uint8_t* rotate){
   float arr[8][8];
-  if(emoji == "smile"){
-    arrcp(&smile[0][0], &arr[0][0], 64);
-  }
-  else if(emoji == "heart"){
-    arrcp(&heart[0][0], &arr[0][0], 64);
-  }
-  else if(emoji == "thumb"){
-    arrcp(&thumb[0][0], &arr[0][0], 64);
-  }
-  else if(emoji == "frown"){
-    arrcp(&frown[0][0], &arr[0][0], 64);
-  }
-  else if(emoji == "finger"){
-    arrcp(&finger[0][0], &arr[0][0], 64);
-  }
-  else if(emoji == "laugh"){
-    arrcp(&laugh[0][0], &arr[0][0], 64);
-  }
-  else if(emoji == "pill"){
-    arrcp(&pill[0][0], &arr[0][0], 64);
-  }
-  else if(emoji == "moonl"){
-    arrcp(&moonl[0][0], &arr[0][0], 64);
-  }
-  else if(emoji == "moonr"){
-    arrcp(&moonr[0][0], &arr[0][0], 64);
-  }
-  else if(emoji == "puke"){
-    arrcp(&puke[0][0], &arr[0][0], 64);
-  }
-  else if(emoji == "left"){
-    arrcp(&left[0][0], &arr[0][0], 64);
-  }
-  else if(emoji == "right"){
-    arrcp(&right[0][0], &arr[0][0], 64);
-  }
-  else if(emoji == "up"){
-    arrcp(&up[0][0], &arr[0][0], 64);
-  }
-  else if(emoji == "down"){
-    arrcp(&down[0][0], &arr[0][0], 64);
-  }
-  else{
-    return 0;
-  }
-     
+  if(emoji == "smile") arrcp(&smile[0][0], &arr[0][0], 64);
+  else if(emoji == "heart") arrcp(&heart[0][0], &arr[0][0], 64);
+  else if(emoji == "thumb") arrcp(&thumb[0][0], &arr[0][0], 64);
+  else if(emoji == "frown") arrcp(&frown[0][0], &arr[0][0], 64);
+  else if(emoji == "finger") arrcp(&finger[0][0], &arr[0][0], 64);
+  else if(emoji == "laugh") arrcp(&laugh[0][0], &arr[0][0], 64);
+  else if(emoji == "pill") arrcp(&pill[0][0], &arr[0][0], 64);
+  else if(emoji == "moonl") arrcp(&moonl[0][0], &arr[0][0], 64);
+  else if(emoji == "moonr") arrcp(&moonr[0][0], &arr[0][0], 64);
+  else if(emoji == "puke") arrcp(&puke[0][0], &arr[0][0], 64);
+  else if(emoji == "left") arrcp(&left[0][0], &arr[0][0], 64);
+  else if(emoji == "right") arrcp(&right[0][0], &arr[0][0], 64);
+  else if(emoji == "up") arrcp(&up[0][0], &arr[0][0], 64);
+  else if(emoji == "down") arrcp(&down[0][0], &arr[0][0], 64);
+  else if(emoji == "RICH") arrcp(&RICH[0][0], &arr[0][0], 64);
+  else return 0;
+  
+  rotateemoji(&arr[0][0], *rotate);
   float arr2[9][9];
   for(int y = 0; y < 9; y++){
     for(int x = 0; x < 9; x++){
@@ -1026,6 +1099,7 @@ int smiley(float dx, float dy, uint8_t* color, float f, String emoji){
       drawxy(x + dxi, y + dyi, color, arr2[x][y]*f, false);
     }
   }
+  *rotate = 0;
   return 8;
 }
 

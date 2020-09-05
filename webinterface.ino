@@ -125,7 +125,7 @@ void handleset(){
     else if(argname == "ssid"){
       int l = value.length();
       if(l >= 50){
-        server.send(0, "text/plain", "password too long");
+        server.send(0, "text/plain", "ssid too long");
       }
       for(uint8_t k = 0; k < 50; k++){
         if(k < l)
