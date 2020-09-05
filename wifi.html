@@ -1,0 +1,38 @@
+<html>
+<head>
+	<meta name="viewport" content="width=device-width, user-scalable=no" />
+</head>
+<body style="font-size: 20px;">
+	<div>SSID: <input id="ssid" type="text" /></div>
+	<div>PW: <input id="pw" type="password" /></div>
+	<div id="send" onclick="send()">send</div>
+	<script type="text/javascript">
+		//https://stackoverflow.com/questions/133925/javascript-post-request-like-a-form-submit?page=1&tab=votes#tab-top
+		function post(path, params, after) {
+		  const form = document.createElement('form');
+		  form.method = 'post';
+		  form.action = path;
+
+		  for (const key in params) {
+		    if (params.hasOwnProperty(key)) {
+		      const hiddenField = document.createElement('input');
+		      hiddenField.type = 'hidden';
+		      hiddenField.name = key;
+		      hiddenField.value = params[key];
+
+		      form.appendChild(hiddenField);
+		    }
+		  }
+
+		  document.body.appendChild(form);
+		  form.submit();
+		  
+		}
+		function send(){
+			const ssid = document.getElementById('ssid').value;
+			const pw = document.getElementById('pw').value;
+			post('set', {'ssid': ssid, 'pw': pw});
+		}
+	</script>
+</body>
+</html>

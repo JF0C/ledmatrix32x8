@@ -32,6 +32,7 @@ uint8_t rich[3] = {255, 109, 12};
 struct confstruct{
   float bright = 0.4;
   float velocity = 0.05;
+  float pulsing = 0;
   String text;
   char ssid[50] = "R.I.C.H.";
   char pw[50] = "r1chl1k35b33r4nd$";
@@ -66,8 +67,8 @@ void setup() {
   Serial.println("dragon_node");
   FastLED.addLeds<WS2813, PIN1>(s1, NUM_LEDS);
   InitFile();
-  InitWeb();
   loadConfig();
+  InitWeb();
   loadPongConf();
   loadBackground();
 }
@@ -89,7 +90,8 @@ void loop() {
 void displayText(){
   if(conf.pongmode || conf.paintmode) return;
   int printlength = printString(conf.text, 0, 32);
-  
+  conf.pulsing = sin((float)t/1000*3.1416*0.5);
+  conf.pulsing *= conf.pulsing;
   if(printlength > 32){
     pos += conf.velocity*(float)dt/1000.0;
     if(conf.velocity > 0){
@@ -119,36 +121,41 @@ int printString(String text, int offset, int len){
   int l = text.length();
   uint8_t color[3];
   colcp(&white[0], &color[0]);
+  uint8_t twinklebatch = 0;
   int k = 0;
+  bool pulse = false;
+  uint8_t rotate = 0;
   for(int k = 0; k < l; k++){
     if(ismarkup(l-k, &k, "<smile>", text.substring(k))) 
-      offset += smiley(offset + pos, 0, color, conf.bright, "smile")+1;
+      offset += smiley(offset + pos, 0, color, getBright(pulse), "smile", &rotate)+1;
     else if(ismarkup(l-k, &k, "<frown>", text.substring(k)))
-      offset += smiley(offset + pos, 0, color, conf.bright, "frown")+1;
+      offset += smiley(offset + pos, 0, color, getBright(pulse), "frown", &rotate)+1;
     else if(ismarkup(l-k, &k, "<laugh>", text.substring(k)))
-      offset += smiley(offset + pos, 0, color, conf.bright, "laugh")+1;
+      offset += smiley(offset + pos, 0, color, getBright(pulse), "laugh", &rotate)+1;
     else if(ismarkup(l-k, &k, "<finger>", text.substring(k)))
-      offset += smiley(offset + pos, 0, color, conf.bright, "finger")+1;
+      offset += smiley(offset + pos, 0, color, getBright(pulse), "finger", &rotate)+1;
     else if(ismarkup(l-k, &k, "<thumb>", text.substring(k)))
-      offset += smiley(offset + pos, 0, color, conf.bright, "thumb")+1;
+      offset += smiley(offset + pos, 0, color, getBright(pulse), "thumb", &rotate)+1;
     else if(ismarkup(l-k, &k, "<heart>", text.substring(k)))
-      offset += smiley(offset + pos, 0, color, conf.bright, "heart")+1;
+      offset += smiley(offset + pos, 0, color, getBright(pulse), "heart", &rotate)+1;
     else if(ismarkup(l-k, &k, "<moon>", text.substring(k)))
-      offset += smiley(offset + pos, 0, color, conf.bright, "moonr")+1;
+      offset += smiley(offset + pos, 0, color, getBright(pulse), "moonr", &rotate)+1;
     else if(ismarkup(l-k, &k, "<moonl>", text.substring(k)))
-      offset += smiley(offset + pos, 0, color, conf.bright, "moonl")+1;
+      offset += smiley(offset + pos, 0, color, getBright(pulse), "moonl", &rotate)+1;
     else if(ismarkup(l-k, &k, "<moonr>", text.substring(k)))
-      offset += smiley(offset + pos, 0, color, conf.bright, "moonr")+1;
+      offset += smiley(offset + pos, 0, color, getBright(pulse), "moonr", &rotate)+1;
     else if(ismarkup(l-k, &k, "<pill>", text.substring(k)))
-      offset += smiley(offset + pos, 0, color, conf.bright, "pill")+1;
+      offset += smiley(offset + pos, 0, color, getBright(pulse), "pill", &rotate)+1;
     else if(ismarkup(l-k, &k, "<left>", text.substring(k)))
-      offset += smiley(offset + pos, 0, color, conf.bright, "left")+1;
+      offset += smiley(offset + pos, 0, color, getBright(pulse), "left", &rotate)+1;
     else if(ismarkup(l-k, &k, "<right>", text.substring(k)))
-      offset += smiley(offset + pos, 0, color, conf.bright, "right")+1;
+      offset += smiley(offset + pos, 0, color, getBright(pulse), "right", &rotate)+1;
     else if(ismarkup(l-k, &k, "<up>", text.substring(k)))
-      offset += smiley(offset + pos, 0, color, conf.bright, "up")+1;
+      offset += smiley(offset + pos, 0, color, getBright(pulse), "up", &rotate)+1;
     else if(ismarkup(l-k, &k, "<down>", text.substring(k)))
-      offset += smiley(offset + pos, 0, color, conf.bright, "down")+1;
+      offset += smiley(offset + pos, 0, color, getBright(pulse), "down", &rotate)+1;
+    else if(ismarkup(l-k, &k, "<RICH>", text.substring(k)))
+      offset += smiley(offset + pos, 0, color, getBright(pulse), "RICH", &rotate)+1;
     else if(ismarkup(l-k, &k, "<blue>", text.substring(k)))
       colcp(&blue[0], &color[0]);
     else if(ismarkup(l-k, &k, "<red>", text.substring(k)))
@@ -170,43 +177,58 @@ int printString(String text, int offset, int len){
     else if(ismarkup(l-k, &k, "<cyan>", text.substring(k)))
       colcp(&cyan[0], &color[0]);
     else if(ismarkup(l-k, &k, "<puke>", text.substring(k))){
-      smiley(offset + pos, 0, white, conf.bright, "frown");
-      offset += smiley(offset + pos, 0, green, conf.bright, "puke")+1;
+      smiley(offset + pos, 0, white, getBright(pulse), "frown", &rotate);
+      offset += smiley(offset + pos, 0, green, getBright(pulse), "puke", &rotate)+1;
     }
     else if(ismarkup(l-k, &k, "<smiling>", text.substring(k)))
-      offset += smiling(offset + pos, 1, color, conf.bright)+1;
+      offset += smiling(offset + pos, 1, color, getBright(pulse))+1;
     else if(ismarkup(l-k, &k, "<laughing>", text.substring(k)))
-      offset += laughing(offset + pos, 1, color, conf.bright)+1;
+      offset += laughing(offset + pos, 1, color, getBright(pulse))+1;
     else if(ismarkup(l-k, &k, "<kissing>", text.substring(k)))
-      offset += kissing(offset + pos, 1, color, conf.bright)+1;
+      offset += kissing(offset + pos, 1, color, getBright(pulse))+1;
     else if(ismarkup(l-k, &k, "<twinkling>", text.substring(k)))
-      twinkling(color, conf.bright);
+      twinkling(color, getBright(pulse), twinklebatch++);
+    else if(ismarkup(l-k, &k, "<rotx>", text.substring(k)))
+      rotate = 1;
+    else if(ismarkup(l-k, &k, "<roty>", text.substring(k)))
+      rotate = 2;
+    else if(ismarkup(l-k, &k, "<rotz>", text.substring(k)))
+      rotate = 4;
+    else if(ismarkup(l-k, &k, "<pulsing>", text.substring(k)))
+      pulse = true;
+    else if(ismarkup(l-k, &k, "</pulsing>", text.substring(k)))
+      pulse = false;
     else if(ismarkup(l-k, &k, "<ae>", text.substring(k)))
-      offset += letter(offset + pos, 0, color, conf.bright, "ä")+1;
+      offset += letter(offset + pos, 0, color, getBright(pulse), "ä")+1;
     else if(ismarkup(l-k, &k, "<oe>", text.substring(k)))
-      offset += letter(offset + pos, 0, color, conf.bright, "ö")+1;
+      offset += letter(offset + pos, 0, color, getBright(pulse), "ö")+1;
     else if(ismarkup(l-k, &k, "<ue>", text.substring(k)))
-      offset += letter(offset + pos, 0, color, conf.bright, "ü")+1;
+      offset += letter(offset + pos, 0, color, getBright(pulse), "ü")+1;
     else if(ismarkup(l-k, &k, "<AE>", text.substring(k)))
-      offset += letter(offset + pos, 0, color, conf.bright, "Ä")+1;
+      offset += letter(offset + pos, 0, color, getBright(pulse), "Ä")+1;
     else if(ismarkup(l-k, &k, "<OE>", text.substring(k)))
-      offset += letter(offset + pos, 0, color, conf.bright, "Ö")+1;
+      offset += letter(offset + pos, 0, color, getBright(pulse), "Ö")+1;
     else if(ismarkup(l-k, &k, "<UE>", text.substring(k)))
-      offset += letter(offset + pos, 0, color, conf.bright, "Ü")+1;
+      offset += letter(offset + pos, 0, color, getBright(pulse), "Ü")+1;
     else if(ismarkup(l-k, &k, "<tum>", text.substring(k))){
-      offset += letter(offset + pos, 0, color, conf.bright, "tum1");
-      offset += letter(offset + pos, 0, color, conf.bright, "tum2");
-      offset += letter(offset + pos, 0, color, conf.bright, "tum3");
-      offset += letter(offset + pos, 0, color, conf.bright, "tum4")+1;
+      offset += letter(offset + pos, 0, color, getBright(pulse), "tum1");
+      offset += letter(offset + pos, 0, color, getBright(pulse), "tum2");
+      offset += letter(offset + pos, 0, color, getBright(pulse), "tum3");
+      offset += letter(offset + pos, 0, color, getBright(pulse), "tum4")+1;
     }
     else if(ismarkup(l-k, &k, "<tums>", text.substring(k))){
-      offset += letter(offset + pos, 0, color, conf.bright, "tums1");
-      offset += letter(offset + pos, 0, color, conf.bright, "tums2")+1;
+      offset += letter(offset + pos, 0, color, getBright(pulse), "tums1");
+      offset += letter(offset + pos, 0, color, getBright(pulse), "tums2")+1;
     }
     else
-      offset += letter(offset + pos, 0, color, conf.bright, String(text[k]))+1;
+      offset += letter(offset + pos, 0, color, getBright(pulse), String(text[k]))+1;
   }
   return offset;
+}
+
+float getBright(bool pulsing){
+  if(pulsing) return conf.bright*conf.pulsing;
+  else return conf.bright;
 }
 
 bool ismarkup(int l, int* k, String pattern, String text){
@@ -281,4 +303,13 @@ void drawBackground(){
 void loadBackground(){
   if(!SPIFFS.exists("/paints/" + conf.background + ".paint")) return;
   loadpaint(conf.background);
+}
+
+bool wStr2CharArr(String str, char* chr, int len){
+  int l = str.length();
+  if(l >= len) return false;
+  for(int k = 0; k < 50; k++){
+    if(k < l) chr[k] = str[k];
+    else chr[k] = 0;
+  }
 }

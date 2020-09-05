@@ -43,7 +43,7 @@ int kissing(float x, float y, uint8_t* col, float f){
   }
   else{
     float intens = sin((s2 - 0.5)*2.0*3.1416);
-    smiley(x + 2, 0, col, conf.bright*intens, "heart")+1;
+    smiley(x + 2, 0, col, conf.bright*intens, "heart", 0)+1;
     return width;
     /*
     for(int yh = 0; yh < 8; yh++){
@@ -96,27 +96,26 @@ struct star{
   unsigned long deathtime;
   uint8_t x;
   uint8_t y;
-  uint8_t col[3];
   bool alive;
 };
 
-star stars[20];
-unsigned long t1;
-void twinkling(uint8_t* col, float f){
-  if(t1 < t){
-    for(uint8_t k = 0; k < 20; k++){
+star stars[30];
+unsigned long spawntimers[6];
+void twinkling(uint8_t* col, float f, uint8_t batch){
+  if(batch > 5) return;
+  if(spawntimers[batch] < t){
+    for(uint8_t k = batch*5; k < batch*5 + 5; k++){
       if(!stars[k].alive){
         stars[k].alive = true;
         stars[k].deathtime = t + 500;
         stars[k].x = random(0, 32);
         stars[k].y = random(0, 8);
-        colcp(col, &stars[k].col[0]);
         break;
       }
     }
-    t1 = t + 100;
+    spawntimers[batch] = t + 100;
   }
-  for(uint8_t k = 0; k < 20; k++){
+  for(uint8_t k = batch*5; k < batch*5 + 5; k++){
     if(stars[k].deathtime < t) stars[k].alive = false;
     if(!stars[k].alive) continue;
     //float age = sin((float)(t - stars[k].deathtime)/500.0*3.1416);
@@ -127,6 +126,10 @@ void twinkling(uint8_t* col, float f){
     drawxy(stars[k].x, stars[k].y-1, col, 0.3*f*age, false);
     drawxy(stars[k].x, stars[k].y+1, col, 0.3*f*age, false);
   }
+}
+
+void riching(float x, float y, uint8_t* col, float f){
+  
 }
 
 float trig(float s, float e, float x){
