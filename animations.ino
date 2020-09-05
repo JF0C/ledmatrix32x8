@@ -128,14 +128,69 @@ void twinkling(uint8_t* col, float f, uint8_t batch){
   }
 }
 
-void riching(float x, float y, uint8_t* col, float f){
-  
-}
-
 float trig(float s, float e, float x){
   float half = (e-s)/2.0;
   if(x < half)
     return x/half;
   else
     return 1.0 - (x-half)/half;
+}
+
+struct ripple{
+  bool alive;
+  unsigned long deathtime;
+  uint8_t x, y;
+};
+
+ripple ripples[4];
+unsigned long droptimer;
+const unsigned long rippletime = 2100;
+void dripping(uint8_t* col, float f, uint8_t batch){
+  if(batch > 0) return;
+  if(droptimer < t){
+    for(uint8_t k = 0; k < 3; k++){
+      if(!ripples[k].alive){
+        ripples[k].alive = true;
+        ripples[k].deathtime = t + rippletime;
+        ripples[k].x = random(0, 32);
+        ripples[k].y = random(0, 8);
+        break;
+      }
+    }
+    droptimer = t + 700;
+  }
+  for(uint8_t k = 0; k < 3; k++){
+    if(ripples[k].deathtime < t) ripples[k].alive = false;
+    if(!ripples[k].alive) continue;
+    float age = (float)(rippletime - ripples[k].deathtime + t)/((float)rippletime);
+    for(int x = -8; x < 8; x++){
+      for(int y = -8; y < 8; y++){
+        float r = sqrt((float)(x*x + y*y));
+        if(r > 9*age+2) continue;
+        int px = x + ripples[k].x;
+        int py = y + ripples[k].y;
+        if(px < 0 || px > 31.0) continue;
+        if(py < 0 || py > 7.0) continue;
+        float val = wavelet(r, age);
+        drawxy(px, py, col, f*val, false);
+      }
+    }
+  }
+}
+
+const float trigsize = 4;
+float wavelet(float r, float age){
+  if(r > 9*age + 2) return 0;
+  float xt = 4.8*age;
+  float s = xt - trigsize;
+  float e = xt + trigsize;
+  float red = 1.0+12.0*age;
+  float roff = 1.0;
+  if(r > 9*age){
+    roff = (r-9*age)/2.0;
+  }
+  float rp = r-16.0*age;
+  if(r < s) return 0;
+  if(r > e) return 0;
+  return 0.5*(1.0+cos(1.5708*rp))*(1.0-abs(xt-r)/trigsize)*(1-age)*roff;
 }

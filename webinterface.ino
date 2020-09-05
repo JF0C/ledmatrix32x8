@@ -27,6 +27,7 @@ void InitWeb(){
   server.on("/set", HTTP_POST, handleset);
   server.on("/set", HTTP_GET, readtext);
   server.on("/conf", HTTP_GET, showconfig);
+  server.on("/framerate", HTTP_GET, handleframerate);
   server.on("/paint", HTTP_POST, handlepaint);
   server.on("/fourier", HTTP_POST, handlefourier);
   server.on("/debugscreen", HTTP_GET, sendscreen);
@@ -314,4 +315,8 @@ void handlefourier(){
     }
   }
   server.send(200, "text/plain", "Sucksess"); 
+}
+
+void handleframerate(){
+  server.send(200, "text/plain", String((float)1000.0/dt));
 }
