@@ -5,7 +5,7 @@ void activate_pong(bool p1){
   if(pconf.player1 && pconf.player2){
     conf.pongmode = true;
     conf.paintmode = false;
-    conf.fouriermode = false
+    conf.fouriermode = false;
     pconf.points_p1 = 0;
     pconf.points_p2 = 0;
     initball(0);

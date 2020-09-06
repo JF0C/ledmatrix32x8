@@ -1,3 +1,13 @@
+// main call for worms in every iteration of loop
+float sine = 0.0;
+void render_worms(){
+  if(!conf.wormsmode) return;
+  sine = (sin(1.5708*(float)t)+1.0)/2.0;
+  drawmap();
+
+  
+}
+
 enum weapons{
   bazooka,
   rifle,
@@ -13,7 +23,8 @@ enum worms_states{
   p2_select,
   p2_move,
   p2_wait_shoot,
-  p2_move_after
+  p2_move_after,
+  game_over
 };
 
 struct projectile{
@@ -41,23 +52,31 @@ struct wormsconfiguration{
   String names[2];
   int tokens[2];
   worm worms[2][4];
-  worms_states state; // 0: player 1 selecting
-             // 1: player 1 moving
-             // 2: player 2 selecting
-             // 3: player 2 moving
-             // 4: waiting for bullet
-             // 5: player 1 moving
-             // 6: player 6 moving
+  worms_states state;
 }wormsconf;
-float sine = 0.0;
 
-// main call for worms in every iteration of loop
-void render_worms(){
-  if(!conf.wormsmode) return;
-  sine = (sin(1.5708*(float)t)+1.0)/2.0;
-  drawmap();
+String getWormsState(){
+  String result = "{\"state\":" + String((int)wormsconf.state) + ",";
+  for(uint8_t k = 0; k < 2; k++){
+    for(uint8_t l = 0; l < 4; l++){
+      result += "\"worm" + String(k) + "." + String(l) + "\":" + String(wormsconf.worms[k][l].health) + ",";
+    }
+  }
+  result += "\"p1_won\":" + hasWonStr(0) + ",";
+  result += "\"p2_won\":" + hasWonStr(1) + ",";
+  result += "\"p1_name\":\"" + wormsconf.names[0] + "\",";
+  result += "\"p2_name\":\"" + wormsconf.names[0] + "\"}";
+  return result;
+}
 
-  
+String hasWonStr(int p){
+  if(hasWon(p)) return "true";
+  return "false";
+}
+
+String validToken(int token){
+  if(wormsconf.tokens[0] == token || wormsconf.tokens[1] == token) return "true";
+  return "false";
 }
 
 bool isSolid(uint8_t x, uint8_t y){
@@ -247,7 +266,7 @@ int initPlayer(String plname, int player){
   return wormsconf.tokens[player];
 }
 
-void initGame(String paint){
+void initWorms(String paint){
   loadpaint(paint);
   wormsconf.state = (worms_states)0;
   for(uint8_t l = 0; l < 2; l++){
@@ -260,6 +279,17 @@ void initGame(String paint){
   }
 }
 
+bool hasWon(int player){
+  bool won = true;
+  int p = -1;
+  if(player == 1) p = 0;
+  else if(player == 0) p = 1;
+  else return false;
+  for(int k = 0; k < 4; k++){
+    if(wormsconf.worms[p][k].health > 0) won = false;
+  }
+  return won;
+}
 
 void draw_worms(){
   for(uint8_t k = 0; k < 2; k++){
@@ -334,7 +364,7 @@ void draw_worms(){
 }
 
 void draw_trajectory(float x, float y, float dy, float ay){
-  
+  TODO
 }
 
 void lifebar(uint8_t x, uint8_t y, int health){

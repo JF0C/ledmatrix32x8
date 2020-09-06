@@ -80,7 +80,7 @@ void draw_color(uint8_t pos, uint8_t* color){
 }
 
 void copypaint(){
-  if(!conf.paintmode || conf.pongmode || conf.fouriermode) return;
+  if(!conf.paintmode) return;
   for(int k = 0; k < NUM_LEDS; k++){
     s1[k].r = (uint8_t)((float)paintdata[k].r*conf.bright);
     s1[k].g = (uint8_t)((float)paintdata[k].g*conf.bright);

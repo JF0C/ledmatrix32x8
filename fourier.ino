@@ -1,9 +1,6 @@
 void render_fourier(bool firstexec){
-    // pixel mahlen
-  if(firstexec){
-    Serial.println("[...] called render_fourier()");
-  }
-  
+    // pixel malen
+
   if(!conf.fouriermode) return;
 
   float laugh[8][8] = {{.0, .0, .5, .9, .9, .5, .0, .0},
@@ -15,11 +12,10 @@ void render_fourier(bool firstexec){
                        {.0, .7, .0, .0, .0, .0, .7, .0},
                        {.0, .0, .5, .9, .9, .5, .0, .0}};
 
-  // pixel mahlen
-  if(firstexec){
-    Serial.println("[...] render_fourier() draw pixel");
-  }
-  
-  drawxy(2, 2, red, conf.bright, false);
+  uint8_t col[] = {255, 255, 255};
+  int p = (t/100)%NUM_LEDS;
+  int x = p%32;
+  int y = p/32;
+  drawxy(x, y, col, 1.0, true);
   
 }

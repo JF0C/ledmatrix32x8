@@ -87,18 +87,18 @@ void loop() {
   t = millis();
   clear_matrix();
   displayText();
+  render_fourier(firstexec);
   render_pong();
+  render_worms();
   copypaint();
   server.handleClient();
-  render_fourier(firstexec);
   FastLED.show();
   //Serial.println("cycle: " + String(dt));
-  firstexec = false;
   delay(1);
 }
 
 void displayText(){
-  if(conf.pongmode || conf.paintmode || conf.fouriermode) return;
+  if(conf.pongmode || conf.paintmode || conf.fouriermode || conf.wormsmode) return;
   int printlength = printString(conf.text, 0, 32);
   conf.pulsing = sin((float)t/1000*3.1416*0.5);
   conf.pulsing *= conf.pulsing;

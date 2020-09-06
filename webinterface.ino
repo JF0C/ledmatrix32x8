@@ -47,6 +47,7 @@ void InitWeb(){
   });
   server.begin();
   Serial.println("wifi started");
+  Serial.println(WiFi.localIP());
 }
 void readtext(){
   server.send(200, "text/plain", readFile("text.txt"));
@@ -59,6 +60,8 @@ void handleset(){
     if(argname == "text"){
       conf.pongmode = false;
       conf.paintmode = false;
+      conf.fouriermode = false;
+      conf.wormsmode = false;
       writeConfig("text", value);
       conf.text = value;
       message = "text set to: " + value;
@@ -306,6 +309,7 @@ void handlefourier(){
   conf.paintmode = false;
   conf.fouriermode = true;
   conf.pongmode = false;
+  conf.wormsmode = false;
   
   for (int i = 0; i < server.args(); i++) {
     String argname = server.argName(i);
@@ -322,6 +326,68 @@ void handleframerate(){
   server.send(200, "text/plain", String((float)1000.0/dt));
 }
 
-void handleworms(){
-  
+void handleworms(){  
+  conf.paintmode = false;
+  conf.fouriermode = false;
+  conf.pongmode = false;
+  conf.wormsmode = true;
+  String msg = "{";
+  int token = 0;
+  for (int i = 0; i < server.args(); i++) {
+    String argname = server.argName(i);
+    String value = server.arg(i);
+    if(argname == "token"){
+      token = value.toInt();
+      msg += "\"token\":" + validToken(token);
+    }
+    else if(argname == "move"){
+      bool left = false;
+      String l = "";
+      if(value.startsWith("l")){
+        left = true;
+        l = "l";
+        value.replace("l", "");
+      }
+      float dy = value.toFloat();
+      if(dy > 2.0) dy = 2.0;
+      if(dy < -2.0) dy = -2.0;
+      move_worm(token, left, dy);
+      msg += "\"move\":\"" + l + String(dy) + "\"";
+    }
+    else if(argname == "worm"){
+      bool confirmed = false;
+      if(value.startsWith("c")){
+        confirmed = true;
+        value.replace("c", "");
+      }
+      select_worm(token, value.toInt(), confirmed);
+      msg += "\"worm\":\"" + value + "\"";
+    }
+    else if(argname == "weapon"){
+      select_weapon(token, value.toInt());
+      msg += "\"weapon\":\"" + value + "\"";
+    }
+    else if(argname == "shoot"){
+      shoot(token);
+      msg += "\"shot\":\"true\"";
+    }
+    else if(argname == "init"){
+      initWorms(value);
+      msg += "\"init\":\"" + value + "\"";
+    }
+    else if(argname == "player"){
+      if(value.startsWith("0")) 
+        msg += "\"player:\":\"" + String(initPlayer(value.substring(1), 0));
+      else if(value.startsWith("1")) 
+        msg += "\"player:\":\"" + String(initPlayer(value.substring(1), 1));
+      else msg += "\"player\":null";
+    }
+    else if(argname == "state"){
+      msg += getWormsState();
+    }
+
+    if(i+1 < server.args()) msg += ",";
+  }
+  msg += "}";
+  server.send(200, "text/json", msg);
 }

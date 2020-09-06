@@ -162,11 +162,13 @@ bool handleFileRead(String path) { // send the right file to the client (if it e
     conf.paintmode = false;
     conf.pongmode = false;
     conf.fouriermode = false;
+    conf.wormsmode = false;
   }
   if(path == "/paint.html"){
     conf.paintmode = true;
     conf.pongmode = false;
     conf.fouriermode = false;
+    conf.wormsmode = false;
     loadpaint("bu/temp");
   }
   String contentType = getContentType(path);             // Get the MIME type

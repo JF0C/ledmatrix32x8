@@ -99,7 +99,7 @@ function loadLastWords(){
 		let t = lasttexts[k].split('<').join('<span><</span>');
 		$('#last-words').append("<div class='sel' id=\"last" + k + "\">" + t + "</div>");
 		$('#last' + k).click(()=>{
-			$('#text-input').val(t.split('[').join('<').split(']').join('>'));
+			$('#text-input').val(t.split('<span><</span>').join('<'));
 			sendtext();
 		});
 	}
