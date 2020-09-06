@@ -312,7 +312,6 @@ void handlefourier(){
     String argname = server.argName(i);
     String value = server.arg(i);
     if(argname == "pixels"){
-      //paintfromweb(value);
       msg = "pixels received";
     }
   }
