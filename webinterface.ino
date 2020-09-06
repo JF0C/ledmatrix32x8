@@ -32,6 +32,7 @@ void InitWeb(){
   server.on("/debugscreen", HTTP_GET, sendscreen);
   server.on("/listfiles", HTTP_GET, listfiles);
   server.on("/changefile", HTTP_POST, handleFileChange);
+  server.on("/worms", HTTP_POST, handleworms);
   server.on("/upload", HTTP_GET,[](){
     server.send(200, "text/html", F("<form method=\"post\" enctype=\"multipart/form-data\"><input type=\"file\" name=\"name\"><input class=\"button\" type=\"submit\" value=\"Upload\"></form>"));
     });
@@ -298,4 +299,8 @@ void sendscreen(){
 
 void handleframerate(){
   server.send(200, "text/plain", String((float)1000.0/dt));
+}
+
+void handleworms(){
+  
 }
