@@ -30,6 +30,7 @@ uint8_t yellow[3] = {255, 255, 0};
 uint8_t cyan[3] = {0, 255, 255};
 uint8_t magenta[3] = {255, 0, 255};
 uint8_t rich[3] = {255, 109, 12};
+uint8_t wormscol[3] = {255, 196, 77};
 
 struct confstruct{
   float bright = 0.4;
@@ -42,6 +43,7 @@ struct confstruct{
   char pw[50] = "74507453497218775126";
   bool pongmode = false;
   bool paintmode = false;
+  bool wormsmode = false;
   bool fouriermode = false;
   String background = "";
   float bgbright = 0.2;
@@ -307,6 +309,19 @@ void drawBackground(){
       uint8_t col[3] = {paintdata[k].g, paintdata[k].r, paintdata[k].b};
       draw_pixel(k, &col[0], conf.bright*conf.bgbright, false);
     }
+  }
+}
+
+void colorAt(uint8_t x, uint8_t y, uint8_t* col, CRGB* source){
+  if(y%2==0){
+    col[0] = source[y*32+x].g;
+    col[1] = source[y*32+x].r;
+    col[2] = source[y*32+x].b;
+  }
+  else{
+    col[0] = source[(y+1)*32 - x-1].g;
+    col[1] = source[(y+1)*32 - x-1].r;
+    col[2] = source[(y+1)*32 - x-1].b;
   }
 }
 
