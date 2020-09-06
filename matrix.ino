@@ -44,7 +44,10 @@ struct confstruct{
   bool pongmode = false;
   bool paintmode = false;
   bool wormsmode = false;
+<<<<<<< HEAD
   bool fouriermode = false;
+=======
+>>>>>>> Jan
   String background = "";
   float bgbright = 0.2;
   uint8_t bgr;
@@ -92,7 +95,10 @@ void loop() {
   render_fourier(firstexec);
   FastLED.show();
   //Serial.println("cycle: " + String(dt));
+<<<<<<< HEAD
   firstexec = false;
+=======
+>>>>>>> Jan
   delay(1);
 }
 
