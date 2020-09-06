@@ -46,7 +46,8 @@ void InitWeb(){
       server.send(404, "text/plain", "404: Not Found"); // otherwise, respond with a 404 (Not Found) error
   });
   server.begin();
-  Serial.println("wifi started");
+  Serial.println("wifi started:");
+  Serial.println(WiFi.localIP());
 }
 void readtext(){
   server.send(200, "text/plain", readFile("text.txt"));
