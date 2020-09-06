@@ -28,6 +28,7 @@ void InitWeb(){
   server.on("/set", HTTP_GET, readtext);
   server.on("/conf", HTTP_GET, showconfig);
   server.on("/paint", HTTP_POST, handlepaint);
+  server.on("/fourier", HTTP_POST, handlefourier);
   server.on("/debugscreen", HTTP_GET, sendscreen);
   server.on("/listfiles", HTTP_GET, listfiles);
   server.on("/changefile", HTTP_POST, handleFileChange);
@@ -293,4 +294,24 @@ void sendscreen(){
     data += String(s1[k].r) + "," + String(s1[k].g) + "," + String(s1[k].b) + ",";
   }
   server.send(200, "text/plain", data);
+}
+
+void handlefourier(){
+  firstexec = true;
+  String msg = "";
+  Serial.println("called handlefourier()");
+  
+  conf.paintmode = false;
+  conf.fouriermode = true;
+  conf.pongmode = false;
+  
+  for (int i = 0; i < server.args(); i++) {
+    String argname = server.argName(i);
+    String value = server.arg(i);
+    if(argname == "pixels"){
+      //paintfromweb(value);
+      msg = "pixels received";
+    }
+  }
+  server.send(200, "text/plain", "Sucksess"); 
 }

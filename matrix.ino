@@ -15,6 +15,8 @@ CRGB paintdata[NUM_LEDS];
 ESP8266WebServer server(80);
 File fsUploadFile;
 
+bool firstexec = true;
+
 unsigned long t = 0;
 uint8_t dt = 0;
 float pos = 0.0;
@@ -33,10 +35,13 @@ struct confstruct{
   float bright = 0.4;
   float velocity = 0.05;
   String text;
-  char ssid[50] = "R.I.C.H.";
-  char pw[50] = "r1chl1k35b33r4nd$";
+  //char ssid[50] = "R.I.C.H.";
+  //char pw[50] = "r1chl1k35b33r4nd$";
+  char ssid[50] = "FRITZ!Box 7560 MS";
+  char pw[50] = "74507453497218775126";
   bool pongmode = false;
   bool paintmode = false;
+  bool fouriermode = false;
   String background = "";
   float bgbright = 0.2;
   uint8_t bgr;
@@ -67,7 +72,7 @@ void setup() {
   FastLED.addLeds<WS2813, PIN1>(s1, NUM_LEDS);
   InitFile();
   InitWeb();
-  loadConfig();
+  //loadConfig();
   loadPongConf();
   loadBackground();
 }
@@ -81,13 +86,15 @@ void loop() {
   render_pong();
   copypaint();
   server.handleClient();
+  render_fourier(firstexec);
   FastLED.show();
   //Serial.println("cycle: " + String(dt));
   delay(5);
+  firstexec = false;
 }
 
 void displayText(){
-  if(conf.pongmode || conf.paintmode) return;
+  if(conf.pongmode || conf.paintmode || conf.fouriermode) return;
   int printlength = printString(conf.text, 0, 32);
   
   if(printlength > 32){
