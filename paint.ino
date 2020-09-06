@@ -26,7 +26,7 @@ void savepaint(String fname){
   writeFile("/paints/" + fname + ".paint", data);
 }
 
-void loadpaint(String fname){
+void loadpixels(String fname, CRGB* target){
   Serial.println("loading " + fname);
   if(!SPIFFS.exists("/paints/" + fname + ".paint")){
     Serial.println("/paints/" + fname + ".paint does not exist");
@@ -44,10 +44,10 @@ void loadpaint(String fname){
     for(int k = 0; k < n; k++){
       current += buff[k];
     }
-    if(c==0) paintdata[idx].r = (uint8_t)current.toInt();
-    else if(c==1) paintdata[idx].g = (uint8_t)current.toInt();
+    if(c==0) target[idx].r = (uint8_t)current.toInt();
+    else if(c==1) target[idx].g = (uint8_t)current.toInt();
     else if(c==2){
-      paintdata[idx].b = (uint8_t)current.toInt();
+      target[idx].b = (uint8_t)current.toInt();
       idx++;
     }
     
@@ -57,6 +57,9 @@ void loadpaint(String fname){
     if(idx >= NUM_LEDS) break;
   }
   Serial.println("written " + fname);
+}
+void loadpaint(String fname){
+  loadpixels(fname, &paintdata[0]);
 }
 
 void paintxy(int x, int y, uint8_t* color){

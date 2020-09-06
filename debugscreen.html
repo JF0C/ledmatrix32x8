@@ -280,16 +280,35 @@
 			<th class="pixel" name="7,31"></th>
     	</tr>
 	</table>
+	<div>
+		<span>Refresh interval in ms: </span>
+		<input id="interval" type="range" min="100" max="1000" name="">
+		<span id="intervalval">100</span>
+	</div>
+	<div>
+		FPS: <span id="fps"></span>
+	</div>
 	<script type="text/javascript">
+		let interval = 100;
 		function getScreen(){
 			$.ajax({
-				'url': 'debugscreen',
+				'url': '/debugscreen',
 				'method': 'GET',
 				'dataType': 'text'
 			}).done(e=>paintFromString(e, true)).fail(e=>console.log(e));
-			setTimeout(()=>getScreen(), 100);
+			setTimeout(()=>getScreen(), interval);
+			$.ajax({
+				'url': 	'/framerate',
+				'method': 'GET',
+				'dataType': 'text'
+			}).done(e=>$('#fps').html(e)).fail(e=>console.log(e));
 		}
 		getScreen();
+		$('#interval').change(e=>{
+			let val = Math.max(100, parseInt(e.target.value));
+			interval = val;
+			$('#intervalval').html(val);
+		});
 	</script>
 </body>
 </html>
