@@ -298,7 +298,6 @@ void sendscreen(){
   server.send(200, "text/plain", data);
 }
 
-<<<<<<< HEAD
 void handlefourier(){
   firstexec = true;
   String msg = "";
@@ -319,8 +318,6 @@ void handlefourier(){
   server.send(200, "text/plain", "Sucksess"); 
 }
 
-=======
->>>>>>> Jan
 void handleframerate(){
   server.send(200, "text/plain", String((float)1000.0/dt));
 }
