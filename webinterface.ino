@@ -319,6 +319,7 @@ void handlefourier(){
     }
   }
   server.send(200, "text/plain", "Sucksess"); 
+  render_fourier();
 }
 
 void handleframerate(){

@@ -1,3 +1,5 @@
+/*
+
 enum weapons{
   bazooka = 10,
   rifle = 11,
@@ -852,3 +854,5 @@ void drawmap(){
     draw_pixel(k, &col[0], conf.bright*f2, false);
   }
 }
+
+*/
