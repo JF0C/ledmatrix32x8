@@ -331,6 +331,14 @@ void loadBackground(){
   loadpaint(conf.background);
 }
 
+int printStringSimple(String str, uint8_t* col, float f, int offset = 0){
+  int p = offset;
+  for(int k = 0; k < str.length(); k++){
+    p += letter(p, 0, col, f, String(str[k]))+1;
+  }
+  return p;
+}
+
 bool wStr2CharArr(String str, char* chr, int len){
   int l = str.length();
   if(l >= len) return false;
@@ -338,4 +346,9 @@ bool wStr2CharArr(String str, char* chr, int len){
     if(k < l) chr[k] = str[k];
     else chr[k] = 0;
   }
+}
+
+String b2s(bool val){
+  if(val) return "true";
+  return "false";
 }

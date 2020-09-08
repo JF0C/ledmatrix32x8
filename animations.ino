@@ -4,13 +4,13 @@ int smiling(float x, float y, uint8_t* col, float f){
   int width = 12;
   float r = ((float)s/(float)tstop)*width*.5;
   for(int k = 6-floor(r); k <= 6+floor(r); k++){
-    plot_antialiased(x + k, y + smilegraph(k, 5.0), col, f, false);
+    plot_antialiased(x + k, y + smilegraph(k, 5.0), col, f, false, false);
   }
   int xa = 6-floor(r)-1;
   float intens = r-(float)floor(r);
-  plot_antialiased(x + xa, y + smilegraph(xa, 5.0), col, intens*f, false);
+  plot_antialiased(x + xa, y + smilegraph(xa, 5.0), col, intens*f, false, false);
   int xb = 12-xa;
-  plot_antialiased(x + xb, y + smilegraph(xb, 5.0), col, intens*f, false);
+  plot_antialiased(x + xb, y + smilegraph(xb, 5.0), col, intens*f, false, false);
   return width;
 }
 
@@ -30,15 +30,15 @@ int kissing(float x, float y, uint8_t* col, float f){
     for(int k = 0; k < width; k++){
       float yk = graph(k, width-2*s);
       if(yk < 0) continue;
-      plot_antialiased(x + k + s, y + 2.0 + (3.0 + s/2)*yk, col, f, false);
+      plot_antialiased(x + k + s, y + 2.0 + (3.0 + s/2)*yk, col, f, false, false);
       if(k < s) continue;
-      plot_antialiased(x + k, y + 2.0, col, f, false);
+      plot_antialiased(x + k, y + 2.0, col, f, false, false);
     }
     for(int k = 0; k < width/2; k++){
       float yk = graph(k, width/2-s/2);
       if(yk < 0) continue;
-      plot_antialiased(x + k + s/2, y + 2.0 - (2.0 + s/2)*yk, col, f, false);
-      plot_antialiased(x + width - k - s/2, y + 2.0 - (2.0 + s/2)*yk, col, f, false);
+      plot_antialiased(x + k + s/2, y + 2.0 - (2.0 + s/2)*yk, col, f, false, false);
+      plot_antialiased(x + width - k - s/2, y + 2.0 - (2.0 + s/2)*yk, col, f, false, false);
     }
   }
   else{
@@ -62,13 +62,14 @@ int laughing(float x, float y, uint8_t* col, float f){
   float s = sin(2.0*3.1416*z)*sin(2.0*3.1416*z) + 0.15*sin(3.5*3.1416*z)*sin(3.5*3.1416*z);
   int width = 12;
   for(int k = 0; k < width; k++){
-    plot_antialiased(x + k, y, col, f, false);
-    plot_antialiased(x + k, y + smilegraph(k, s*3.0 + 2.0), col, f, false);
+    plot_antialiased(x + k, y, col, f, false, false);
+    plot_antialiased(x + k, y + smilegraph(k, s*3.0 + 2.0), col, f, false, false);
   }
   return width;
 }
 
-void plot_antialiased(float x, float y, uint8_t* col, float intens, bool linear){
+void plot_antialiased(float x, float y, uint8_t* col, float intens, bool linear, bool ov){
+  if(x < 0 || x > 31 || y < 0 || y > 7) return;
   int nx = floor(x);
   int ny = floor(y);
   float fx = x - (float)nx;
@@ -86,10 +87,10 @@ void plot_antialiased(float x, float y, uint8_t* col, float intens, bool linear)
     f01 = (1.0-fx)*fy*(1.0-fx)*fy;
     f11 = fx*fx*fy*fy;
   }
-  drawxy(nx, ny, col, intens*f00, false);
-  drawxy(nx+1, ny, col, intens*f10, false);
-  drawxy(nx, ny+1, col, intens*f01, false);
-  drawxy(nx+1, ny+1, col, intens*f11, false);
+  drawxy(nx, ny, col, intens*f00, ov);
+  drawxy(nx+1, ny, col, intens*f10, ov);
+  drawxy(nx, ny+1, col, intens*f01, ov);
+  drawxy(nx+1, ny+1, col, intens*f11, ov);
 }
 
 struct star{

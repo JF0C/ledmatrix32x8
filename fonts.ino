@@ -462,6 +462,7 @@ float letter_dot[1][8] = {{.0, .0, .0, .0, .0, .0, .9, .0}};
 float letter_sc[2][8] = {{.0, .0, .0, .0, .0, .0, .9, .0},
                          {.0, .0, .9, .0, .9, .9, .0, .0}};
 float letter_em[1][8] = {{.0, .9, .9, .9, .9, .0, .9, .0}};
+float letter_vert[1][8] = {{.0, .9, .9, .9, .9, .9, .9, .0}};
 float letter_com[2][8] = {{.0, .0, .0, .0, .0, .0, .9, .0},
                           {.0, .0, .0, .0, .9, .9, .0, .0}};
 float letter_minus[3][8] = {{.0, .0, .0, .0, .9, .0, .0, .0},
@@ -907,6 +908,10 @@ int letter(float dx, float dy, uint8_t* color, float f, String letter){
   else if(letter == "\\"){
     width = 3;
     arrcp(&letter_bs[0][0], &arr[0][0], width*8);
+  }
+  else if(letter == "|"){
+    width = 1;
+    arrcp(&letter_vert[0][0], &arr[0][0], width*8);
   }
   else if(letter == "tum1"){
     width = 5;

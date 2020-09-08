@@ -340,17 +340,22 @@ void handleworms(){
       msg += "\"token\":" + validToken(token);
     }
     else if(argname == "move"){
-      bool left = false;
+      int dir = 0;
       String l = "";
       if(value.startsWith("l")){
-        left = true;
+        dir = -1;
         l = "l";
         value.replace("l", "");
       }
+      if(value.startsWith("r")){
+        dir = 1;
+        l = "r";
+        value.replace("r", "");
+      }
       float dy = value.toFloat();
-      if(dy > 2.0) dy = 2.0;
-      if(dy < -2.0) dy = -2.0;
-      move_worm(token, left, dy);
+      if(dy > 1.0) dy = 1.0;
+      if(dy < -1.0) dy = -1.0;
+      move_worm(token, dir, dy);
       msg += "\"move\":\"" + l + String(dy) + "\"";
     }
     else if(argname == "worm"){
@@ -370,16 +375,27 @@ void handleworms(){
       shoot(token);
       msg += "\"shot\":\"true\"";
     }
-    else if(argname == "init"){
-      initWorms(value);
-      msg += "\"init\":\"" + value + "\"";
+    else if(argname == "setmap"){
+      int res = initMap(token, value);
+      msg += "\"setmap\":\"";
+      if(res == 0) msg += value + "\"";
+      else if(res == 1) msg += "invalid token\"";
+      else if(res == 2) msg += "invalid map\"";
+      else msg += "unknown error\"";
+    }
+    else if(argname == "mapconfirm"){
+      bool res = confirmMap(token);
+      msg += "\"mapconfirm\":" + b2s(res);
     }
     else if(argname == "player"){
       if(value.startsWith("0")) 
-        msg += "\"player:\":\"" + String(initPlayer(value.substring(1), 0));
+        msg += "\"player\":" + String(initPlayer(value.substring(1), 0));
       else if(value.startsWith("1")) 
-        msg += "\"player:\":\"" + String(initPlayer(value.substring(1), 1));
+        msg += "\"player\":" + String(initPlayer(value.substring(1), 1));
       else msg += "\"player\":null";
+    }
+    else if(argname == "verify"){
+      msg += "\"verify\":" + verify_token(value.toInt());
     }
     else if(argname == "state"){
       msg += getWormsState();

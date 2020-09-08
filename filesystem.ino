@@ -29,6 +29,10 @@ void handleFileUpload(){ // upload a new file to the SPIFFS
 }
 
 void writeFile(String fname, String data){
+  if(fname == ""){
+    Serial.println("cant write file: no name given");
+    return;
+  }
   File file = SPIFFS.open(fname, "w");
   if(!file){
     Serial.print("Error: could not open file " + fname);
@@ -170,6 +174,13 @@ bool handleFileRead(String path) { // send the right file to the client (if it e
     conf.fouriermode = false;
     conf.wormsmode = false;
     loadpaint("bu/temp");
+  }
+  if(path == "/worms.html"){
+    if(!conf.wormsmode) startWorms();
+    conf.paintmode = false;
+    conf.pongmode = false;
+    conf.fouriermode = false;
+    conf.wormsmode = true;
   }
   String contentType = getContentType(path);             // Get the MIME type
   String pathWithGz = path + ".gz";

@@ -129,11 +129,8 @@ void drawgame(){
       if(pconf.name_p2 != "") msg = pconf.name_p2 + "Wins";
       else msg = "P2 wins!";
     }
-    int p = 1;
     float f = (float)(pconf.tstart - t - 3000.0)/3000.0;
-    for(int k = 0; k < msg.length(); k++){
-      p += letter(p, 0, color, conf.bright*f, String(msg[k]))+1;
-    }
+    printStringSimple(msg, color, conf.bright*f, 1);
     return;
   }
   if(pconf.tstart > t && pconf.tstart <= t + 3000){
