@@ -86,6 +86,7 @@ void loop() {
   dt = millis() - t;
   t = millis();
   clear_matrix();
+  render_fourier();
   displayText();
   render_fourier(firstexec);
   render_pong();
@@ -346,6 +347,16 @@ bool wStr2CharArr(String str, char* chr, int len){
     if(k < l) chr[k] = str[k];
     else chr[k] = 0;
   }
+}
+
+int getMax(int* array, int size)
+{
+  int maximum = array[0];
+  for (int i = 0; i < size; i++)
+  {
+    if (array[i] > maximum) maximum = array[i];
+  }
+  return maximum;
 }
 
 String b2s(bool val){

@@ -113,12 +113,14 @@ void loadConfig(){
   conf.bgb = json["bgb"].as<uint8_t>();
   conf.bgbright = json["bgbright"].as<float>();
   conf.paintr = json["paintr"].as<uint8_t>();
-  
+
+  /*
   if(!wStr2CharArr(json["ssid"].as<String>(), &conf.ssid[0], 50))
     Serial.println("ERROR: wifi name too long");
   
   if(!wStr2CharArr(json["pw"].as<String>(), &conf.pw[0], 50))
     Serial.println("ERROR: wifi password too long");
+  */
   
   file.close();
 }
