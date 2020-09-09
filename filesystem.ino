@@ -119,6 +119,10 @@ void loadConfig(){
   
   if(!wStr2CharArr(json["pw"].as<String>(), &conf.pw[0], 50))
     Serial.println("ERROR: wifi password too long");
+<<<<<<< Updated upstream
+=======
+  
+>>>>>>> Stashed changes
   
   file.close();
 }
