@@ -49,12 +49,24 @@ struct wormsconfiguration{
              // 5: player 1 moving
              // 6: player 6 moving
 }wormsconf;
+<<<<<<< Updated upstream
 float sine = 0.0;
 
 // main call for worms in every iteration of loop
 void render_worms(){
   if(!conf.wormsmode) return;
   sine = (sin(1.5708*(float)t)+1.0)/2.0;
+=======
+
+const unsigned long tmove = 10000;
+const unsigned long tafter = 5000;
+float sineval = 0.0;
+// main call for worms in every iteration of loop
+void render_worms(){
+  if(!conf.wormsmode) return;
+  sineval = (sin(1.5708*(float)t/300.0)+1.0)/2.0;
+  
+>>>>>>> Stashed changes
   drawmap();
 
   
@@ -232,6 +244,19 @@ void initWorm(int worm, int player){
     wormsconf.worms[player][worm].x = pos;
     wormsconf.worms[player][worm].y = 2;
   }
+<<<<<<< Updated upstream
+=======
+  wormsconf.worms[player][worm].health = 100;
+  wormsconf.worms[player][worm].weapon = bazooka;
+  wormsconf.worms[player][worm].timer = 0;
+  wormsconf.worms[player][worm].dy = 0;
+  if(worm == 0){
+    wormsconf.worms[player][worm].selected = true;
+  }
+  else{
+    wormsconf.worms[player][worm].selected = false;
+  }
+>>>>>>> Stashed changes
   if(player == 1) wormsconf.worms[player][worm].look_left = true;
   else wormsconf.worms[player][worm].look_left = false;
 }
@@ -241,8 +266,69 @@ int initPlayer(String plname, int player){
   if(wormsconf.tokens[player] != 0) return 0;
   wormsconf.names[player] = plname;
   wormsconf.tokens[player] = random(10000) + 1;
+<<<<<<< Updated upstream
   for(uint8_t k = 0; k < 4; k++){
     initWorm(k, player);
+=======
+  return wormsconf.tokens[player];
+}
+
+bool checkInit(){
+  //Serial.print("map exists: "); Serial.println(SPIFFS.exists("/paints/" + wormsconf.mapname + ".paint"));
+  return SPIFFS.exists("/paints/" + wormsconf.mapname + ".paint") && wormsconf.tokens[0] != 0 && wormsconf.tokens[1] != 0 && wormsconf.map_selected;
+}
+
+void print_winner(){
+  String message = "";
+  uint8_t col[3];
+  
+  if(hasWon(0) && !hasWon(1)) {
+    if(wormsconf.names[0] == "") message = "Pl1 wins!";
+    else message = wormsconf.names[0] + " wins!";
+    colcp(red, col);
+  }
+  if(!hasWon(0) && hasWon(1)) {
+    if(wormsconf.names[1] == "") message = "Pl2 wins!";
+    else message = wormsconf.names[1] + " wins!";
+    colcp(blue, col);
+  }
+  if(hasWon(0) && hasWon(1)){
+    message = "draw";
+    colcp(white, col);
+  }
+
+  printStringSimple(message, col, conf.bright*sineval);
+}
+
+String verify_token(int token){
+  if(wormsconf.tokens[0] == token || wormsconf.tokens[1] == token) return "true";
+  else return "false";
+}
+
+void print_start(){
+  String msg = "";
+  char rnd_char[] = {'#', '3', ' ', '*', '?', '/', '-'};
+  if(wormsconf.tokens[0] == 0 && wormsconf.tokens[1] == 0){
+    msg = "WORMS!";
+    String msg2 = "";
+    for(uint8_t k = 0; k < msg.length(); k++){
+      int r1 = random(100);
+      if(r1 >= 6){
+        msg2 += msg[k];
+      }
+      else{
+        msg2 += rnd_char[r1];
+      }
+    }
+    printStringSimple(msg2, white, conf.bright, 2);
+  }
+  else{
+    if(wormsconf.names[0] == "") printStringSimple("Pl1", red, conf.bright);
+    else printStringSimple(wormsconf.names[0], red, conf.bright);
+    printStringSimple(":", white, conf.bright, 15);
+    if(wormsconf.names[1] == "") printStringSimple("Pl2", blue, conf.bright, 17);
+    else printStringSimple(wormsconf.names[1], blue, conf.bright, 17);
+>>>>>>> Stashed changes
   }
   return wormsconf.tokens[player];
 }
@@ -279,9 +365,40 @@ void draw_worms(){
         plot_antialiased(x-1, y-2, wormscol, conf.bright, false);
         plot_antialiased(x+1, y-2, wormscol, conf.bright, false);
         // player color
+<<<<<<< Updated upstream
         plot_antialiased(x, y-2, pcol, conf.bright, false);
         continue;
       }
+=======
+        plot_antialiased(xcross, ycross-2, pcol, 0.5*conf.bright*sineval, false, false);
+        
+        continue;
+      }
+      // highlights
+      if(wormsconf.worms[k][l].selected && turn_p1 && k == 0){
+        // selected marker
+        plot_antialiased(x, y-1, pcol, conf.bright*sineval, false, false);
+        if(wormsconf.state == p1_move){
+          projectile* b = &(bullets[wormsconf.worms[k][l].weapon]);
+          draw_trajectory(x + look, y - 1, wormsconf.worms[k][l].dy, b->ay, b->vbase, look);
+        }
+      }
+      
+      if(wormsconf.worms[k][l].selected && turn_p2 && k == 1){
+        // selected marker
+        plot_antialiased(x, y-1, pcol, conf.bright*sineval, false, false);
+        if(wormsconf.state == p2_move){
+          projectile* b = &(bullets[wormsconf.worms[k][l].weapon]);
+          draw_trajectory(x + look, y - 1, wormsconf.worms[k][l].dy, b->ay, b->vbase, look);
+        }
+      }
+
+      
+      // normal marker
+      if(!wormsconf.worms[k][l].selected || (turn_p2 && k==0) || (turn_p1 && k==1)){
+        plot_antialiased(x, y-1, pcol, conf.bright, false, false);
+      }
+>>>>>>> Stashed changes
       // lower body
       plot_antialiased(x, y, wormscol, conf.bright, false);
       // player color / badge
@@ -325,8 +442,13 @@ void draw_worms(){
           plot_antialiased(x, y, yellow, 0.5*conf.bright, false);
           break;
         case laser:
+<<<<<<< Updated upstream
           plot_antialiased(x+look, y+1, white, conf.bright, false);
           plot_antialiased(x+2*look, y+1, green, conf.bright*sine, false);
+=======
+          plot_antialiased(x+look, y-1, orange, conf.bright, false, false);
+          plot_antialiased(x+2*look, y-1, green, conf.bright*sineval, false, false);
+>>>>>>> Stashed changes
           break;
       }
     }
@@ -338,6 +460,7 @@ void draw_trajectory(float x, float y, float dy, float ay){
 }
 
 void lifebar(uint8_t x, uint8_t y, int health){
+<<<<<<< Updated upstream
   float h = (float)3.0*health/100.0;
   float hi = floor(h);
   float hf = h - (float)hi;
@@ -345,6 +468,12 @@ void lifebar(uint8_t x, uint8_t y, int health){
     drawxy(x + k, y, green, conf.bright, false);
   }
   drawxy(x + hi, y, green, conf.bright*hf, false);
+=======
+  float h = (float)health/100.0;
+  if(h < 0.25) h *= sineval;
+  else h *= h;
+  drawxy(x, y, green, conf.bright*h, false);
+>>>>>>> Stashed changes
 }
 
 void paintxyf(float x, float y, uint8_t* col, float intens){
