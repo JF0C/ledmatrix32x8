@@ -93,12 +93,9 @@ void loop() {
   render_fourier(firstexec);
   FastLED.show();
   //Serial.println("cycle: " + String(dt));
-<<<<<<< Updated upstream
-  firstexec = false;
-  delay(1);
-=======
+
   delay(5);
->>>>>>> Stashed changes
+
 }
 
 void displayText(){
@@ -342,4 +339,17 @@ bool wStr2CharArr(String str, char* chr, int len){
     if(k < l) chr[k] = str[k];
     else chr[k] = 0;
   }
+}
+
+int printStringSimple(String str, uint8_t* col, float f, int offset = 0){
+  int p = offset;
+  for(int k = 0; k < str.length(); k++){
+    p += letter(p, 0, col, f, String(str[k]))+1;
+  }
+  return p;
+}
+
+String b2s(bool val){
+  if(val) return "true";
+  return "false";
 }

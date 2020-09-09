@@ -322,10 +322,6 @@ void handleframerate(){
   server.send(200, "text/plain", String((float)1000.0/dt));
 }
 
-<<<<<<< Updated upstream
-void handleworms(){
-  
-=======
 void handleworms(){  
   conf.paintmode = false;
   conf.fouriermode = false;
@@ -407,5 +403,4 @@ void handleworms(){
   }
   msg += "}";
   server.send(200, "text/json", msg);
->>>>>>> Stashed changes
 }

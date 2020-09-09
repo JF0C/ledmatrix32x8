@@ -157,8 +157,6 @@ body{
 	display: inline-block;
 	border: 1px solid black;
 	padding: 5px;
-<<<<<<< Updated upstream
-=======
 }
 #elevation{
 	width: 10%;
@@ -249,5 +247,4 @@ body{
 }
 #worms-maps{
 	border: 1px solid cyan;
->>>>>>> Stashed changes
 }

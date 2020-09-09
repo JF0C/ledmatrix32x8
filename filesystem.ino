@@ -29,6 +29,10 @@ void handleFileUpload(){ // upload a new file to the SPIFFS
 }
 
 void writeFile(String fname, String data){
+  if(fname == ""){
+    Serial.println("cant write file: no name given");
+    return;
+  }
   File file = SPIFFS.open(fname, "w");
   if(!file){
     Serial.print("Error: could not open file " + fname);
@@ -109,20 +113,14 @@ void loadConfig(){
   conf.bgb = json["bgb"].as<uint8_t>();
   conf.bgbright = json["bgbright"].as<float>();
   conf.paintr = json["paintr"].as<uint8_t>();
-<<<<<<< Updated upstream
-=======
 
->>>>>>> Stashed changes
-  
+  /*
   if(!wStr2CharArr(json["ssid"].as<String>(), &conf.ssid[0], 50))
     Serial.println("ERROR: wifi name too long");
   
   if(!wStr2CharArr(json["pw"].as<String>(), &conf.pw[0], 50))
     Serial.println("ERROR: wifi password too long");
-<<<<<<< Updated upstream
-=======
-  
->>>>>>> Stashed changes
+  */
   
   file.close();
 }
@@ -169,11 +167,22 @@ bool handleFileRead(String path) { // send the right file to the client (if it e
     loadBackground();
     conf.paintmode = false;
     conf.pongmode = false;
+    conf.fouriermode = false;
+    conf.wormsmode = false;
   }
   if(path == "/paint.html"){
     conf.paintmode = true;
     conf.pongmode = false;
+    conf.fouriermode = false;
+    conf.wormsmode = false;
     loadpaint("bu/temp");
+  }
+  if(path == "/worms.html"){
+    if(!conf.wormsmode) startWorms();
+    conf.paintmode = false;
+    conf.pongmode = false;
+    conf.fouriermode = false;
+    conf.wormsmode = true;
   }
   String contentType = getContentType(path);             // Get the MIME type
   String pathWithGz = path + ".gz";
