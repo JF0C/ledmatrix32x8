@@ -72,7 +72,7 @@ struct pongconfiguration{
 void setup() {
   Serial.begin(115200);
   delay(100);
-  Serial.println("dragon_node");
+  Serial.println("matrix");
   FastLED.addLeds<WS2813, PIN1>(s1, NUM_LEDS);
   InitFile();
   loadConfig();

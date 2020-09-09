@@ -353,8 +353,8 @@ void handleworms(){
         value.replace("r", "");
       }
       float dy = value.toFloat();
-      if(dy > 1.0) dy = 1.0;
-      if(dy < -1.0) dy = -1.0;
+      if(dy > 2.0) dy = 2.0;
+      if(dy < -2.0) dy = -2.0;
       move_worm(token, dir, dy);
       msg += "\"move\":\"" + l + String(dy) + "\"";
     }

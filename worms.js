@@ -63,6 +63,14 @@ function sendNamePlayer(){
 		decentAlert('select player first!');
 		return;
 	}
+	if(state.state != 0){
+		sendWormsC({'verify': getCookie('token' + msg)}, e=>{
+			if(e.verify) decentAlert('welcome back ' + playername());
+			else decentAlert('please restart the game');
+			return;
+		});
+		return;
+	}
 	let name = $('#worms-name').val();
 	if(name.length < 1 || name.length > 3) {
 		decentAlert('name must have 1-3 letters');
@@ -80,6 +88,11 @@ function sendNamePlayer(){
 		}
 		setCookie('token' + msg, e.player)
 	});
+}
+
+function playername(str){
+	if(str == '0') return state.p1_name;
+	if(str == '1') return state.p2_name;
 }
 
 function move(dir){
@@ -229,8 +242,28 @@ function getState(){
 			case 9:
 				setTitle('setting up');
 				setContainers('11000');
+				setCookie('token0', ';Expires=Wed, 21 Oct 2015 07:28:00 GMT');
+				setCookie('token1', ';Expires=Wed, 21 Oct 2015 07:28:00 GMT');
+				setCookie('token', ';Expires=Wed, 21 Oct 2015 07:28:00 GMT');
 				break;
 		}
+		if(!$('#player1').hasClass('selected') && !$('#player2').hasClass('selected')){
+			$('#player-select').css('display', 'block');
+		}
+		if(state.p1_name !== undefined && 
+			state.p1_name != null && 
+			state.p1_name.length > 0 && 
+			state.state != 0 &&
+			state.state != 9)
+			$('#player1').html(state.p1_name);
+		else $('#player1').html('Player1');
+		if(state.p2_name !== undefined && 
+			state.p2_name != null && 
+			state.p2_name.length > 0 && 
+			state.state != 0 &&
+			state.state != 9)
+			$('#player2').html(state.p2_name);
+		else $('#player2').html('Player2');
 		if(debug !== null) setContainers('11111');
 	});
 	setTimeout(()=>getState(), 300);

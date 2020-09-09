@@ -20,8 +20,11 @@ body{
 	width: 45%;
 	height: 8%;
 }
-.radio.selected{
-	background: lightgrey;
+#p1.selected{
+	background: lightpink;
+}
+#p2.selected{
+	background: lightblue;
 }
 .radiocontainer{
 	margin-bottom: 10px;

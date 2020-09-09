@@ -37,6 +37,7 @@ struct worm{
   bool look_left;
   int health;
   bool selected;
+  unsigned long timer;
   weapons weapon;
 };
 
@@ -71,6 +72,7 @@ void render_worms(){
     Serial.println("game over");
     wormsconf.game_over = true;
     wormsconf.state = game_over;
+    wormsconf.timer = t;
   }
   
   switch(wormsconf.state){
@@ -141,7 +143,6 @@ void render_worms(){
       break;
     case game_over:
       print_winner();
-      wormsconf.timer = t;
       if(t - wormsconf.timer > 2000){
         startWorms();
       }
@@ -245,7 +246,7 @@ void shoot(int token){
   bulletcp(wormsconf.worms[player][worm].weapon, 0, look,
            wormsconf.worms[player][worm].dy,
            wormsconf.worms[player][worm].x + look,
-           wormsconf.worms[player][worm].y);
+           wormsconf.worms[player][worm].y - 1);
   bullets[0].alive = true;
   if(wormsconf.worms[player][worm].weapon == bat){
     bullets[0].x = wormsconf.worms[player][worm].x + 2*look;
@@ -255,8 +256,8 @@ void shoot(int token){
       bulletcp(wormsconf.worms[player][worm].weapon, k, look,
                wormsconf.worms[player][worm].dy,
                wormsconf.worms[player][worm].x + look, 
-               wormsconf.worms[player][worm].y);
-      bullets[k].vy += ((float)random(100)-50.0)*0.005;
+               wormsconf.worms[player][worm].y - 1);
+      bullets[k].vy += ((float)random(100)-50.0)*0.03;
       bullets[k].alive = true;
     }
   }
@@ -283,6 +284,7 @@ void move_worm(int token, int dir, float y){
   int worm = wormFromPlayer(player);
   if(worm == -1) return;
   if(wormsconf.worms[player][worm].health <= 0) return;
+  wormsconf.worms[player][worm].dy = y;
   if(dir < 0){
     wormsconf.worms[player][worm].look_left = true;
     int x = ceil(wormsconf.worms[player][worm].x);
@@ -292,6 +294,7 @@ void move_worm(int token, int dir, float y){
     }
     x = floor(wormsconf.worms[player][worm].x);
     if(isSolid(x-1, y)) wormsconf.worms[player][worm].y -= 1;
+    worm_fall(player, worm);
   }
   if(dir > 0){
     wormsconf.worms[player][worm].look_left = false;
@@ -302,9 +305,8 @@ void move_worm(int token, int dir, float y){
     }
     x = ceil(wormsconf.worms[player][worm].x);
     if(isSolid(x-1, y)) wormsconf.worms[player][worm].y -= 1;
+    worm_fall(player, worm);
   }
-  wormsconf.worms[player][worm].dy = y;
-  worm_fall(player, worm);
   if(wormsconf.worms[player][worm].health < 0) wormsconf.shot = true;
 }
 
@@ -346,6 +348,7 @@ void initWorm(int worm, int player){
   }
   wormsconf.worms[player][worm].health = 100;
   wormsconf.worms[player][worm].weapon = bazooka;
+  wormsconf.worms[player][worm].timer = 0;
   if(worm == 0){
     wormsconf.worms[player][worm].selected = true;
   }
@@ -470,14 +473,14 @@ int initMap(int token, String paint){
   bullets[bazooka].destruct = 0.6;
   bullets[bazooka].radius = 3;
   bullets[bazooka].vbase = 4;
-  bullets[bazooka].ay = 0.5;
+  bullets[bazooka].ay = 0.7;
   
   bullets[rifle].damage = 6;
   bullets[rifle].alive = false;
-  bullets[rifle].radius = 0.5;
+  bullets[rifle].radius = 1.0;
   bullets[rifle].destruct = 0.4;
   bullets[rifle].vbase = 10;
-  bullets[rifle].ay = 0.1; 
+  bullets[rifle].ay = 0.2; 
       
   bullets[laser].alive = false;
   bullets[laser].damage = 20;
@@ -522,16 +525,22 @@ void draw_worms(){
       bool turn_p2 = wormsconf.state == p2_select || wormsconf.state == p2_move || wormsconf.state == p2_move_after;
       if(wormsconf.worms[k][l].look_left) look = -1;
       if(wormsconf.worms[k][l].health <= 0){
+        if(wormsconf.worms[k][l].timer == 0){
+          wormsconf.worms[k][l].timer = t;
+        }
+        if(t - wormsconf.worms[k][l].timer > tmove) continue;
+        float f = 1.0 - (float)(t - wormsconf.worms[k][l].timer)/(float)tmove;
         // cross if died
         int xcross = floor(x);
         int ycross = floor(y);
-        plot_antialiased(xcross, ycross, wormscol, 0.5*conf.bright*sine, false, false);
-        plot_antialiased(xcross, ycross-1, wormscol, 0.5*conf.bright*sine, false, false);
-        plot_antialiased(xcross, ycross-3, wormscol, 0.5*conf.bright*sine, false, false);
-        plot_antialiased(xcross-1, ycross-2, wormscol, 0.5*conf.bright*sine, false, false);
-        plot_antialiased(xcross+1, ycross-2, wormscol, 0.5*conf.bright*sine, false, false);
+        plot_antialiased(xcross, ycross, wormscol, conf.bright*f, false, false);
+        plot_antialiased(xcross, ycross-1, wormscol, conf.bright*f, false, false);
+        plot_antialiased(xcross, ycross-3, wormscol, conf.bright*f, false, false);
+        plot_antialiased(xcross-1, ycross-2, wormscol, conf.bright*f, false, false);
+        plot_antialiased(xcross+1, ycross-2, wormscol, conf.bright*f, false, false);
         // player color
         plot_antialiased(xcross, ycross-2, pcol, 0.5*conf.bright*sine, false, false);
+        
         continue;
       }
       // highlights
@@ -608,8 +617,6 @@ void worm_fall(int p, int w){
     fallen += 1.0;
   }
   if(wormsconf.worms[p][w].y > 7.0) wormsconf.worms[p][w].y = 7.0;
-  Serial.println("fallen: " + String(fallen+1));
-  Serial.println("worm y: " + String(wormsconf.worms[p][w].y));
   if(fallen > 1)
     wormsconf.worms[p][w].health -= (fallen-1)*8;
 }
@@ -644,19 +651,21 @@ int draw_bullets(){
     switch(weapon){
       case bazooka:
         if(bullets[k].vx == 0){
-          float f = t - bullets[k].timer;
-          if(f >= 500) bullets[k].alive = false;
-          f /= 500.0;
-          float r = f * 2.0 * bullets[k].radius;
-          if(f > 0.5) r = bullets[k].radius * (1.0 - 2.0*f);
-          for(int l = r; l <= r; l++){
-            int mlim = round(sqrt(r*r-l*l));
-            for(int m = -mlim; m <= mlim; m++){
-              plot_antialiased(bullets[k].x + l, bullets[k].y + m, red, conf.bright*(1.0-f), false, false);
+          float f = (float)(t - bullets[k].timer)/500.0;
+          if(f >= 1.0) {
+            bullets[k].alive = false;
+            break;
+          }
+          float r = bullets[k].radius * f;
+          for(int bx = floor(-r-1); bx <= ceil(r); bx++){
+            for(int by = floor(-r-1); by <= ceil(r); by++){
+              if(bx*bx + by*by < r*r)
+                plot_antialiased(bullets[k].x + bx, bullets[k].y + by, red, conf.bright * (1-f), false, false);
             }
           }
           break;
         }
+        if(bullets[k].vx*delta > bullets[k].radius) Serial.println("warning: bazooka skipping pixels");
         bullets[k].x += bullets[k].vx*delta;
         bullets[k].y += bullets[k].vy*delta;
         bullets[k].vy += bullets[k].ay*delta;
@@ -680,6 +689,7 @@ int draw_bullets(){
           break;
         }
         if(bullets[k].timer > t) break;
+        if(bullets[k].vx*delta > bullets[k].radius) Serial.println("warning: rifle skipping pixels");
         bullets[k].x += bullets[k].vx*delta;
         bullets[k].y += bullets[k].vy*delta;
         bullets[k].vy += bullets[k].ay*delta;
@@ -767,12 +777,15 @@ int draw_bullets(){
 }
 
 void damage_calc(float x, float y, uint8_t weapon){
-  for(int dx = -bullets[weapon].radius; dx <= bullets[weapon].radius; dx++){
-    float dist = sqrt(bullets[weapon].radius*bullets[weapon].radius - dx*dx);
-    int dylim = round(dist);
-    for(int dy = -dylim; dy <= dylim; dy++){
-      if(dist < 1) paint_reduce(x + dx, y + dy, bullets[weapon].destruct);
-      else paint_reduce(x + dx, y + dy, (bullets[weapon].radius - dist + 0.5) / bullets[weapon].radius * bullets[weapon].destruct);
+  float r2 = bullets[weapon].radius*bullets[weapon].radius;
+  for(int dx = floor(-bullets[weapon].radius-1); dx <= ceil(bullets[weapon].radius); dx++){
+    int d2 = dx * dx;    
+    for(int dy = floor(-bullets[weapon].radius-1); dy <= ceil(bullets[weapon].radius); dy++){
+      int dist = d2 + dy*dy;
+      if(dist <= 1) 
+        paint_reduce(x + dx, y + dy, bullets[weapon].destruct);
+      else if(dist < r2)
+        paint_reduce(x + dx, y + dy, (r2 - dist + 0.5) / r2 * bullets[weapon].destruct);
     }
   }
   for(uint8_t p = 0; p < 2; p++){
@@ -781,7 +794,7 @@ void damage_calc(float x, float y, uint8_t weapon){
       worm* w1 = &(wormsconf.worms[p][w]);
       float dx = w1->x - x;
       float dy = w1->y - y;
-      float dist = min(min(sqrt(dx*dx + dy*dy), sqrt(dx*dx + (dy+1)*(dy+1))), sqrt(dx*dx + (dy+2)*(dy+2)));
+      float dist = min(min(sqrt(dx*dx + dy*dy), sqrt(dx*dx + (dy-1)*(dy-1))), sqrt(dx*dx + (dy-2)*(dy-2)));
       if(dist > bullets[weapon].radius) continue;
       int h1 = w1->health;
       if(dist < 1) w1->health -= bullets[weapon].damage;
@@ -793,8 +806,10 @@ void damage_calc(float x, float y, uint8_t weapon){
 }
 
 void lifebar(uint8_t x, uint8_t y, int health){
-  float h = (float)1.0*health/100.0;
-  drawxy(x, y, green, conf.bright*sine, false);
+  float h = (float)health/100.0;
+  if(h < 0.25) h *= sine;
+  else h *= h;
+  drawxy(x, y, green, conf.bright*h, false);
   /*
   float hi = floor(h);
   float hf = h - (float)hi;
