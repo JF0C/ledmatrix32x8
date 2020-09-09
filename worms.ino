@@ -4,7 +4,6 @@ enum weapons{
   laser = 12,
   bat = 13
 };
-
 enum worms_states{
   game_start,
   p1_select,
@@ -17,7 +16,6 @@ enum worms_states{
   p2_move_after,
   game_over
 };
-
 struct projectile{
   float vx, vy, vbase;
   float x, y;
@@ -40,7 +38,6 @@ struct worm{
   unsigned long timer;
   weapons weapon;
 };
-
 struct wormsconfiguration{
   String names[2] = {"", ""};
   int tokens[2];
@@ -58,11 +55,11 @@ struct wormsconfiguration{
 
 const unsigned long tmove = 10000;
 const unsigned long tafter = 5000;
-float sineval = 0.0;
+float sine = 0.0;
 // main call for worms in every iteration of loop
 void render_worms(){
   if(!conf.wormsmode) return;
-  sineval = (sin(1.5708*(float)t/300.0)+1.0)/2.0;
+  sine = (sin(1.5708*(float)t/300.0)+1.0)/2.0;
   
   drawmap();
   draw_worms();
@@ -211,7 +208,6 @@ void select_worm(int token, int worm, bool confirmed){
   if(confirmed && wormsconf.worms[player][sel].health > 0) 
     wormsconf.worm_selected = true;
 }
-
 void select_weapon(int token, int weapon){
   int player = playerFromToken(token);
   if(player == -1) return;
@@ -309,13 +305,11 @@ void move_worm(int token, int dir, float y){
   }
   if(wormsconf.worms[player][worm].health < 0) wormsconf.shot = true;
 }
-
 int playerFromToken(int token){
   if(wormsconf.tokens[0] == token) return 0;
   if(wormsconf.tokens[1] == token) return 1;
   return -1;
 }
-
 int wormFromPlayer(int player){
   if(player < 0 || player > 1) return -1;
   for(uint8_t k = 0; k < 4; k++){
@@ -323,7 +317,6 @@ int wormFromPlayer(int player){
   }
   return -1;
 }
-
 void initWorm(int worm, int player){
   int pos = random(16) + player * 16;
   while(xHasWorm(pos)){
@@ -376,12 +369,10 @@ int initPlayer(String plname, int player){
   wormsconf.tokens[player] = random(10000) + 1;
   return wormsconf.tokens[player];
 }
-
 bool checkInit(){
   //Serial.print("map exists: "); Serial.println(SPIFFS.exists("/paints/" + wormsconf.mapname + ".paint"));
   return SPIFFS.exists("/paints/" + wormsconf.mapname + ".paint") && wormsconf.tokens[0] != 0 && wormsconf.tokens[1] != 0 && wormsconf.map_selected;
 }
-
 void print_winner(){
   String message = "";
   uint8_t col[3];
@@ -400,15 +391,12 @@ void print_winner(){
     message = "draw";
     colcp(white, col);
   }
-
-  printStringSimple(message, col, conf.bright*sineval);
+  printStringSimple(message, col, conf.bright*sine);
 }
-
 String verify_token(int token){
   if(wormsconf.tokens[0] == token || wormsconf.tokens[1] == token) return "true";
   else return "false";
 }
-
 void print_start(){
   String msg = "";
   char rnd_char[] = {'#', '3', ' ', '*', '?', '/', '-'};
@@ -546,7 +534,7 @@ void draw_worms(){
       // highlights
       if(wormsconf.worms[k][l].selected && turn_p1 && k == 0){
         // selected marker
-        plot_antialiased(x, y-1, pcol, conf.bright*sineval, false, false);
+        plot_antialiased(x, y-1, pcol, conf.bright*sine, false, false);
         if(wormsconf.state == p1_move){
           projectile* b = &(bullets[wormsconf.worms[k][l].weapon]);
           draw_trajectory(x + look, y - 1, wormsconf.worms[k][l].dy, b->ay, b->vbase, look);
@@ -555,13 +543,12 @@ void draw_worms(){
       
       if(wormsconf.worms[k][l].selected && turn_p2 && k == 1){
         // selected marker
-        plot_antialiased(x, y-1, pcol, conf.bright*sineval, false, false);
+        plot_antialiased(x, y-1, pcol, conf.bright*sine, false, false);
         if(wormsconf.state == p2_move){
           projectile* b = &(bullets[wormsconf.worms[k][l].weapon]);
           draw_trajectory(x + look, y - 1, wormsconf.worms[k][l].dy, b->ay, b->vbase, look);
         }
       }
-
       
       // normal marker
       if(!wormsconf.worms[k][l].selected || (turn_p2 && k==0) || (turn_p1 && k==1)){
@@ -807,7 +794,7 @@ void damage_calc(float x, float y, uint8_t weapon){
 
 void lifebar(uint8_t x, uint8_t y, int health){
   float h = (float)health/100.0;
-  if(h < 0.25) h *= sineval;
+  if(h < 0.25) h *= sine;
   else h *= h;
   drawxy(x, y, green, conf.bright*h, false);
 }

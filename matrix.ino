@@ -94,7 +94,9 @@ void loop() {
   server.handleClient();
   FastLED.show();
   //Serial.println("cycle: " + String(dt));
+
   delay(5);
+
 }
 
 void displayText(){
@@ -348,14 +350,12 @@ bool wStr2CharArr(String str, char* chr, int len){
   }
 }
 
-int getMax(int* array, int size)
-{
-  int maximum = array[0];
-  for (int i = 0; i < size; i++)
-  {
-    if (array[i] > maximum) maximum = array[i];
+int printStringSimple(String str, uint8_t* col, float f, int offset = 0){
+  int p = offset;
+  for(int k = 0; k < str.length(); k++){
+    p += letter(p, 0, col, f, String(str[k]))+1;
   }
-  return maximum;
+  return p;
 }
 
 String b2s(bool val){
