@@ -6,7 +6,6 @@ body{
     display: inline-block;
     height: 100%;
     width: 45%;
-	user-select: none;
 }
 .fscontainer{
 	height: 70%;
@@ -163,15 +162,22 @@ body{
 	padding: 5px;
 }
 #elevation{
-	transform: rotate(270deg);
+	width: 10%;
+	height: 250px;
+	border: 1px solid black;
+	display: inline-block;
+	vertical-align: middle;
+}
+#slider-knob{
+	width: 100%;
+	height: 10%;
 	position: relative;
-	top: 5px;
-	left: -50px;
+	background: black;
 }
 .wbutton{
 	display: inline-block;
 	border: 1px solid black;
-	width: 26%;
+	width: 40%;
 	height: 250px;
 	line-height: 250px;
 	vertical-align: middle;

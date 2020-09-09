@@ -37,10 +37,10 @@ struct confstruct{
   float velocity = 0.05;
   float pulsing = 0;
   String text;
-  //char ssid[50] = "R.I.C.H.";
-  //char pw[50] = "r1chl1k35b33r4nd$";
-  char ssid[50] = "FRITZ!Box 7560 MS";
-  char pw[50] = "74507453497218775126";
+  char ssid[50] = "R.I.C.H.";
+  char pw[50] = "r1chl1k35b33r4nd$";
+  //char ssid[50] = "FRITZ!Box 7560 MS";
+  //char pw[50] = "74507453497218775126";
   bool pongmode = false;
   bool paintmode = false;
   bool wormsmode = false;
@@ -88,14 +88,13 @@ void loop() {
   clear_matrix();
   render_fourier();
   displayText();
-  render_fourier(firstexec);
   render_pong();
   render_worms();
   copypaint();
   server.handleClient();
   FastLED.show();
   //Serial.println("cycle: " + String(dt));
-  delay(1);
+  delay(5);
 }
 
 void displayText(){

@@ -34,7 +34,6 @@ $(document).ready(()=>{
 	});
 	$('#worms-left').click(e=>move("l"));
 	$('#worms-right').click(e=>move("r"));
-	$('#elevation').change(e=>move(''));
 	$.ajax({
 			"url": "listfiles",
 			"type": "GET",
@@ -52,8 +51,58 @@ $(document).ready(()=>{
 				sendWormsC({'setmap': $(e.target).html()});
 			});
 		}).fail((e)=> console.log(e));
+
+	$('#slider-knob').on('touchmove', e=>{
+		e.preventDefault();
+		sliding(e.changedTouches[0].clientY);
+	});
+	$('#slider-knob').bind('touchend', function(){
+	    $('#slider-val').css({'display': 'none'});
+	    move('');
+	});
+	let down = false;
+	$(document).mousedown(function(e){if(e.which === 1) down = true;});
+    $(document).mouseup(function(e){
+    	if(e.which === 1) down = false; 
+    	$('#slider-val').css({'display': 'none'});
+    	move('');
+    });
+	$('#slider-knob').mousemove(e=>{
+		if(!down) return;
+		sliding(e.clientY);
+	});
+
 	getState();
 });
+
+function sliding(y){
+	let sliderheight = parseFloat($('#slider-knob').css('height'));
+	let starty = $('#elevation').position().top;
+	let maxtop = parseFloat($('#elevation').css('height')) - sliderheight;
+	let slidertop = y - starty - sliderheight/2;
+	if(slidertop < 0) slidertop = 0;
+	if(slidertop > maxtop) slidertop = maxtop;
+	$('#slider-knob').css('top', '' + slidertop + 'px');
+
+	let startx = $('#elevation').position().left - 50;
+
+	$('#slider-val').css({'top': (starty + slidertop + 1) + 'px', 'left': startx + 'px', 'display': 'block'});
+	let value = sliderScale(slidertop/maxtop);
+	if(isNaN(value)) 
+		console.log('slider value isnan!')
+	$('#slider-val').html('' + value);
+}
+
+function setSlider(val){
+	let norm = (val+2)/4;
+	let sliderheight = parseFloat($('#slider-knob').css('height'));
+	let maxtop = parseFloat($('#elevation').css('height')) - sliderheight;
+	$('#slider-knob').css('top', '' + (maxtop * norm).toFixed(0) + 'px');
+}
+
+function sliderScale(val){
+	return -((val*4)-2).toFixed(1);
+}
 
 function sendNamePlayer(){
 	let msg = "";
@@ -63,11 +112,10 @@ function sendNamePlayer(){
 		decentAlert('select player first!');
 		return;
 	}
-	if(state.state != 0){
-		sendWormsC({'verify': getCookie('token' + msg)}, e=>{
+	if(state !== undefined && state.state != 0){
+		sendWorms({'verify': getCookie('token' + msg)}, e=>{
 			if(e.verify) decentAlert('welcome back ' + playername());
-			else decentAlert('please restart the game');
-			return;
+			else setCookie('token' + msg, ';Expires=Wed, 21 Oct 2015 07:28:00 GMT');
 		});
 		return;
 	}
@@ -97,11 +145,15 @@ function playername(str){
 
 function move(dir){
 	if(state.state == 2 || state.state == 4 || state.state == 6 || state.state == 8){
-		let dy = parseFloat($('#elevation').val())/-100;
+		let dy = parseFloat($('#slider-val').html()) * -1;
+		if(isNaN(dy)) {
+			dy = 0;
+			console.log('caution elevation slider produced NaN');
+		}
 		sendWormsC({'move': dir+dy}, e => {
 			let res = e.move;
 			if(res.startsWith('r') || res.startsWith('l')) res = res.substring(1);
-			$('#elevation').val(parseFloat(res)*-100);
+			$('#slider-knob').css('top', );
 		});
 	}
 	if(state.state == 1){
@@ -286,7 +338,7 @@ function setSelectors(player, state){
 	for(k in state){
 		if(!k.startsWith('worm' + player + '.')) continue;
 		if(!state[k].selected) continue;
-		$('#elevation').val(parseFloat(state[k].dy)*-100);
+		setSlider(state[k].dy);
 		$('.weapon-radio').removeClass('selected');
 		$('.weapon-radio[data=' + state[k].weapon + ']').addClass('selected');
 	}
