@@ -1,8 +1,7 @@
 int testfunction(float Time){
   float Pi = 3.14159265359;
-  return (int) 100*(cos(2*Pi*100*Time)+(1+0.5*cos(2*Pi*100*Time))*sin(2*Pi*300*Time))+100;
+  return (int) 50*(cos(2*Pi*100*Time)+(1+0.5*cos(2*Pi*100*Time))*sin(2*Pi*300*Time)+1);
 }
-
 
 byte sine_data [91]=  {0,  
                         4,    9,    13,   18,   22,   27,   31,   35,   40,   44, 
@@ -24,20 +23,24 @@ int amps[64] = {2, 2, 2, 2, 2, 2, 2, 2,
                 2, 2, 2, 2, 2, 2, 2, 2,
                 2, 2, 2, 2, 2, 3, 2, 2};
 
-int N = 64;
+int N = 32;
 
-void render_fourier(){
-  clear_matrix();
-  
+void render_fourier(){  
   if(!conf.fouriermode) return;
   int maxamps = getMax(amps, N);
   //Serial.print("Max amplitude: ");
   //Serial.println(maxamps);
 
-  for(int i=0; i<N; i++){
+  for(int i=0; i<N/2; i++){
     int nrleds = floor((float) amps[i]/ (float) maxamps * 8);
     for(int j = 0; j<nrleds; j++){
-      drawxy(i, 7-j, red, 0.9, false);
+      drawxy(N/2-i-1, 7-j, red, 0.9, false);
+    }
+  }
+  for(int i=0; i<N/2; i++){
+    int nrleds = floor((float) amps[i]/ (float) maxamps * 8);
+    for(int j = 0; j<nrleds; j++){
+      drawxy(N/2+i, 7-j, red, 0.9, false);
     }
   }
 }
@@ -61,9 +64,7 @@ void call_FFT(){
     testsignal[i] = testfunction((float)i * dt_test);
   }
 
-  float output = Q_FFT(testsignal, N, fs);
-  Serial.print("Frequency of highest amplitude: ");
-  Serial.println(output);
+  Full_FFT(testsignal, N, fs);
 }
 
 float Q_FFT(int in[],int N,float Frequency)
@@ -77,6 +78,11 @@ float Q_FFT(int in[],int N,float Frequency)
       
   int out_r[Pow2[o]];   //real part of transform
   int out_im[Pow2[o]];  //imaginory part of transform
+
+  for(int i = 0; i < Pow2[o]; i++){
+    out_r[i] = 0;
+    out_im[i] = 0;
+  }
            
   x=0;  
   
@@ -173,16 +179,15 @@ float Q_FFT(int in[],int N,float Frequency)
    amps[i] = out_r[i];
      
   }
-  /*
+  
   float fa,fb,fc;
   fa=out_r[fm-1];
   fb=out_r[fm]; 
   fc=out_r[fm+1];
   fstep=(fa*(fm-1)+fb*fm+fc*(fm+1))/(fa+fb+fc);
-  */
+  
   return (fstep*Frequency/N);
 }
-    
 
 float sine(int i)
 {
@@ -213,40 +218,39 @@ float cosine(int i)
 void Full_FFT(int in[],byte N,float Frequency)
 {
     /*
-    Code to perform FFT on arduino,
-    setup:
-    paste sine_data [91] at top of program [global variable], paste FFT function at end of program
-    Term:
+    Code to perform FFT on ESP2866,
+    Iputs:
     1. in[]     : Data array, 
     2. N        : Number of sample (recommended sample size 2,4,8,16,32,64,128...)
     3. Frequency: sampling frequency required as input (Hz)
-    
-    If sample size is not in power of 2 it will be clipped to lower side of number. 
-    i.e, for 150 number of samples, code will consider first 128 sample, remaining sample  will be omitted.
-    For Arduino nano, FFT of more than 128 sample not possible due to mamory limitation (64 recomended)
-    For higher Number of sample may arise Mamory related issue,
-    Code by ABHILASH
-    Contact: abhilashpatel121@gmail.com 
+
+    Quicker, but less accurate: Q_FFT() on top
     Documentation:https://www.instructables.com/member/abhilash_patel/instructables/
     */
 
     unsigned int data[13]={1,2,4,8,16,32,64,128,256,512,1024,2048};
     int a,c1,f,o,x;
-    a=N;  
+    a=N;
                                      
-    for(int i=0;i<12;i++){ if(data[i]<=a){o=i;} }                 //calculating the levels
+    for(int i=0;i<12;i++){ if(data[i]<=N){o=i;} }
     
     int in_ps[data[o]];     //input for sequencing
     float out_r[data[o]];   //real part of transform
     float out_im[data[o]];  //imaginory part of transform
+
+    for(int i = 0; i < data[o]; i++){
+      in_ps[i]  = 0;
+      out_r[i] = 0;
+      out_im[i] = 0;
+    }
                
     x=0;  
-    
+
     for(int b=0;b<o;b++){                     // bit reversal
       c1=data[b];
       f=data[o]/(c1+c1);
       for(int j=0;j<c1;j++)
-      { 
+      {
         x=x+1;
         in_ps[x]=in_ps[j]+f;
       }
@@ -254,19 +258,20 @@ void Full_FFT(int in[],byte N,float Frequency)
 
     for(int i=0;i<data[o];i++){            // update input array as per bit reverse order
       if(in_ps[i]<a){out_r[i]=in[in_ps[i]];}
-      if(in_ps[i]>a){out_r[i]=in[in_ps[i]-a];}      
+      if(in_ps[i]>a){out_r[i]=in[in_ps[i]-a];} 
     }
     
     int i10,i11,n1;
     float e,c,s,tr,ti;
 
-    for(int i=0;i<o;i++){                                    //fft
+    //fft
+    for(int i=0;i<o;i++){
       i10=data[i];              // overall values of sine/cosine  :
       i11=data[o]/data[i+1];    // loop with similar sine cosine:
       e=360/data[i+1];
       e=0-e;
       n1=0;
-
+      
       for(int j=0;j<i10;j++){
         c=cosine(e*j);
         s=sine(e*j);    
@@ -293,41 +298,17 @@ void Full_FFT(int in[],byte N,float Frequency)
       Serial.print(out_im[i]); Serial.println("i");      
     }
     */
-    
     //---> here onward out_r contains amplitude and out_im conntains frequency (Hz)
     for(int i=0;i<data[o-1];i++){               // getting amplitude from compex number
       out_r[i]=sqrt(out_r[i]*out_r[i]+out_im[i]*out_im[i]); // to  increase the speed delete sqrt
       out_im[i]=i*Frequency/N;
-     
+
+      /*
       Serial.print(out_im[i]); Serial.print("Hz");
       Serial.print("\t");
       Serial.println(out_r[i]); 
+      */
+      if(i==0){ amps[i] = out_r[i];}
+      else{ amps[i] = 2*out_r[i];}
     }
-    
-    /*
-    x=0;       // peak detection
-    for(int i=1;i<data[o-1]-1;i++){
-      if(out_r[i]>out_r[i-1] && out_r[i]>out_r[i+1]){
-        in_ps[x]=i;    //in_ps array used for storage of peak number
-        x=x+1;
-      }    
-    }
-    
-    s=0;
-    c=0;
-    for(int i=0;i<x;i++){            // re arraange as per magnitude
-      for(int j=c;j<x;j++){
-        if(out_r[in_ps[i]]<out_r[in_ps[j]]){ 
-          s=in_ps[i];
-          in_ps[i]=in_ps[j];
-          in_ps[j]=s;
-        }
-      }
-      c=c+1;
-    }
-    
-    for(int i=0;i<5;i++){     // updating f_peak array (global variable)with descending order
-      f_peaks[i]=out_im[in_ps[i]];
-    }
-    */
 }
