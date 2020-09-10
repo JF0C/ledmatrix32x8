@@ -72,7 +72,7 @@ struct pongconfiguration{
 void setup() {
   Serial.begin(115200);
   delay(100);
-  Serial.println("dragon_node");
+  Serial.println("matrix");
   FastLED.addLeds<WS2813, PIN1>(s1, NUM_LEDS);
   InitFile();
   loadConfig();
@@ -86,11 +86,11 @@ void loop() {
   dt = millis() - t;
   t = millis();
   clear_matrix();
+  render_fourier();
   displayText();
   render_pong();
   copypaint();
   server.handleClient();
-  render_fourier(firstexec);
   FastLED.show();
   //Serial.println("cycle: " + String(dt));
 
@@ -348,6 +348,17 @@ int printStringSimple(String str, uint8_t* col, float f, int offset = 0){
   }
   return p;
 }
+
+int getMax(int* array, int size)
+{
+  int maximum = array[0];
+  for (int i = 0; i < size; i++)
+  {
+    if (array[i] > maximum) maximum = array[i];
+  }
+  return maximum;
+}
+
 
 String b2s(bool val){
   if(val) return "true";

@@ -10,7 +10,7 @@ void handleFileUpload(){ // upload a new file to the SPIFFS
   if(upload.status == UPLOAD_FILE_START){
     String filename = upload.filename;
     if(!filename.startsWith("/")) filename = "/"+filename;
-    Serial.print("handleFileUpload Name: "); Serial.println(filename);
+    Serial.print(F("handleFileUpload Name: ")); Serial.println(filename);
     fsUploadFile = SPIFFS.open(filename, "w");            // Open the file for writing in SPIFFS (create if it doesn't exist)
     filename = String();
   } else if(upload.status == UPLOAD_FILE_WRITE){
@@ -19,8 +19,8 @@ void handleFileUpload(){ // upload a new file to the SPIFFS
   } else if(upload.status == UPLOAD_FILE_END){
     if(fsUploadFile) {                                    // If the file was successfully created
       fsUploadFile.close();                               // Close the file again
-      Serial.print("handleFileUpload Size: "); Serial.println(upload.totalSize);
-      server.sendHeader("Location","/upload");      // Redirect the client to the success page
+      Serial.print(F("handleFileUpload Size: ")); Serial.println(upload.totalSize);
+      server.sendHeader(F("Location"),F("/upload"));      // Redirect the client to the success page
       server.send(303);
     } else {
       server.send(500, F("text/plain"), F("500: couldn't create file"));
@@ -30,17 +30,17 @@ void handleFileUpload(){ // upload a new file to the SPIFFS
 
 void writeFile(String fname, String data){
   if(fname == ""){
-    Serial.println("cant write file: no name given");
+    Serial.println(F("cant write file: no name given"));
     return;
   }
   File file = SPIFFS.open(fname, "w");
   if(!file){
-    Serial.print("Error: could not open file " + fname);
+    Serial.print(F("Error: could not open file ")); Serial.println(fname);
     return;
   }
   int n = file.print(data);
   if(n == 0){
-    Serial.print("Error: could not write to file " + fname);
+    Serial.print(F("Error: could not write to file ")); Serial.println(fname);
   }
   Serial.println("File " + fname + " written");
   file.close();
@@ -61,40 +61,88 @@ String readFile(String fname){
 }
 
 StaticJsonDocument<600> json;
-void writeConfig(String key, String data){
-  writeAnyConfig(key, data, "/config.json");
+bool writeConfig(String key, String data){
+  return writeAnyConfig(key, data, F("/config.json"), -1);
 }
 
-void writePongConf(String key, String data){
-  writeAnyConfig(key, data, "/pconfig.json");
+bool writePongConf(String key, String data){
+  return writeAnyConfig(key, data, F("/pconfig.json"), -1);
 }
 
-void writeAnyConfig(String key, String data, String fname){
+bool addWifi(String ssid, String pw){
+  if(ssid.length() > 50){
+    Serial.println("ssid too long");
+    return false;
+  }
+  if(pw.length() > 50){
+    Serial.println("pw too long");
+    return false;
+  }
+  return writeAnyConfig(ssid, pw, F("/wificonfig.json"), 20);
+}
+
+bool removeWifi(String ssid){
+  return removeJsonEntry(F("/wificonfig.json"), ssid);
+}
+
+bool writeAnyConfig(String key, String data, String fname, int maxsize){
   File file = SPIFFS.open(fname, "r");
   if(!file){
     Serial.print(F("Error: could not open file ")); Serial.println(fname);
-    return;
+    return false;
   }
   DeserializationError err = deserializeJson(json, file);
   file.close();
   if(err){
     Serial.println(F("Error: could not deserialize config"));
-    return;
+    return false;
   }
+  if(maxsize > 0 && json.as<JsonObject>().size() >= maxsize){
+    Serial.println("could not write " + key + "=" + data + " object already full");
+    return false;
+  }
+  
   json[key] = data;
   file = SPIFFS.open(fname, "w");
   if (serializeJson(json, file) == 0) {
     Serial.print(F("Error: Failed to write to file ")); Serial.println(fname);
+    file.close();
+    return false;
   }
   else{
     Serial.println(key + ": " + data);
   }
   Serial.println("written: " + key + "=" + data);
   file.close();
+  return true;
+}
+
+bool removeJsonEntry(String fname, String key){
+  File file = SPIFFS.open(fname, "r");
+  if(!file){
+    Serial.print(F("Error: could not open file ")); Serial.println(fname);
+    return false;
+  }
+  DeserializationError err = deserializeJson(json, file);
+  file.close();
+  if(err){
+    Serial.println(F("Error: could not deserialize config"));
+    return false;
+  }
+  json.remove(key);
+  file = SPIFFS.open(fname, "w");
+  if (serializeJson(json, file) == 0) {
+    Serial.print(F("Error: Failed to write to file ")); Serial.println(fname);
+    file.close();
+    return false;
+  }
+  Serial.println("removed: " + key);
+  file.close();
+  return true;
 }
 
 void loadConfig(){
-  File file = SPIFFS.open("/config.json", "r");
+  File file = SPIFFS.open(F("/config.json"), "r");
   if(!file){
     Serial.println(F("Error: could not open config file"));
     return;
@@ -114,14 +162,17 @@ void loadConfig(){
   conf.bgbright = json["bgbright"].as<float>();
   conf.paintr = json["paintr"].as<uint8_t>();
 
-  /*
   if(!wStr2CharArr(json["ssid"].as<String>(), &conf.ssid[0], 50))
-    Serial.println("ERROR: wifi name too long");
+    Serial.println(F("ERROR: wifi name too long"));
   
   if(!wStr2CharArr(json["pw"].as<String>(), &conf.pw[0], 50))
-    Serial.println("ERROR: wifi password too long");
-  */
-  
+    Serial.println(F("ERROR: wifi password too long"));
+    
+  // TODO maze
+  // two mazes generated automatically
+  // two players work throgh it first one to get to the middle wins
+ 
+
   file.close();
 }
 

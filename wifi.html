@@ -1,38 +1,18 @@
 <html>
 <head>
 	<meta name="viewport" content="width=device-width, user-scalable=no" />
+	<script type="text/javascript" src="./jquery-3.3.1.min.js"></script>
+	<script type="text/javascript" src="./wifi.js"></script>
+	<link rel="stylesheet" href="./style.css">
 </head>
-<body style="font-size: 20px;">
-	<div>SSID: <input id="ssid" type="text" /></div>
-	<div>PW: <input id="pw" type="password" /></div>
-	<div id="send" onclick="send()">send</div>
-	<script type="text/javascript">
-		//https://stackoverflow.com/questions/133925/javascript-post-request-like-a-form-submit?page=1&tab=votes#tab-top
-		function post(path, params, after) {
-		  const form = document.createElement('form');
-		  form.method = 'post';
-		  form.action = path;
-
-		  for (const key in params) {
-		    if (params.hasOwnProperty(key)) {
-		      const hiddenField = document.createElement('input');
-		      hiddenField.type = 'hidden';
-		      hiddenField.name = key;
-		      hiddenField.value = params[key];
-
-		      form.appendChild(hiddenField);
-		    }
-		  }
-
-		  document.body.appendChild(form);
-		  form.submit();
-		  
-		}
-		function send(){
-			const ssid = document.getElementById('ssid').value;
-			const pw = document.getElementById('pw').value;
-			post('set', {'ssid': ssid, 'pw': pw});
-		}
-	</script>
+<body style="font-size: 24px;">
+	<h1>wifi</h1>
+	<div style="font-size:18px;"><a href="/">back</a></div>
+	<div><div class="wifi-label">SSID:</div><input id="ssid" type="text" /></div>
+	<div><div class="wifi-label">PW:</div><input id="pw" type="password" /></div>
+	<div id="new">add wifi</div>
+	<div style="margin-top: 10px; border-bottom: 1px solid black;">select wifi:</div>
+	<div id="knownwifis"></div>
+	<div id="setwifi">set</div>
 </body>
 </html>

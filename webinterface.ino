@@ -25,7 +25,6 @@ void InitWeb(){
 
   server.on("/pong", HTTP_POST, pong);
   server.on("/set", HTTP_POST, handleset);
-  server.on("/set", HTTP_GET, readtext);
   server.on("/conf", HTTP_GET, showconfig);
   server.on("/framerate", HTTP_GET, handleframerate);
   server.on("/paint", HTTP_POST, handlepaint);
@@ -34,6 +33,7 @@ void InitWeb(){
   server.on("/listfiles", HTTP_GET, listfiles);
   server.on("/changefile", HTTP_POST, handleFileChange);
   server.on("/worms", HTTP_POST, handleworms);
+  server.on("/addwifi", HTTP_POST, handleAddWifi);
   server.on("/upload", HTTP_GET,[](){
     server.send(200, "text/html", F("<form method=\"post\" enctype=\"multipart/form-data\"><input type=\"file\" name=\"name\"><input class=\"button\" type=\"submit\" value=\"Upload\"></form>"));
     });
@@ -48,9 +48,7 @@ void InitWeb(){
   server.begin();
   Serial.println("wifi started");
 }
-void readtext(){
-  server.send(200, "text/plain", readFile("text.txt"));
-}
+
 void handleset(){
   String message = "invalid command";
   for (int i = 0; i < server.args(); i++) {
@@ -128,6 +126,7 @@ void handleset(){
       int l = value.length();
       if(l >= 50){
         server.send(0, "text/plain", "ssid too long");
+        break;
       }
       for(uint8_t k = 0; k < 50; k++){
         if(k < l)
@@ -142,6 +141,7 @@ void handleset(){
       int l = value.length();
       if(l >= 50){
         server.send(0, "text/plain", "password too long");
+        break;
       }
       for(uint8_t k = 0; k < 50; k++){
         if(k < l)
@@ -154,6 +154,28 @@ void handleset(){
     }
   }
   server.send(200, "text/plain", message);
+}
+
+void handleAddWifi(){
+  String msg = "";
+  for (int i = 0; i < server.args(); i++) {
+    if(i > 0) break;
+    String argname = server.argName(i);
+    String value = server.arg(i);
+    if(argname == "remove"){
+      if(removeWifi(value)) msg = "{\"remove\": true}";
+      else msg = "{\"remove\": false}";
+    }
+    else{
+      if (argname < 1 || value < 8){
+        msg = "{\"add\": false}";
+        break;
+      }
+      if (addWifi(argname, value)) msg = "{\"add\": true}";
+      else msg = "{\"add\": false}";
+    }
+  }
+  server.send(200, "text/json", msg);
 }
 
 void showconfig(){

@@ -52,11 +52,11 @@ struct wormsconfiguration{
 }wormsconf;
 const unsigned long tmove = 10000;
 const unsigned long tafter = 5000;
-float sine = 0.0;
+float sineval = 0.0;
 // main call for worms in every iteration of loop
 void render_worms(){
   if(!conf.wormsmode) return;
-  sine = (sin(1.5708*(float)t/300.0)+1.0)/2.0;
+  sineval = (sin(1.5708*(float)t/300.0)+1.0)/2.0;
   
   drawmap();
   draw_worms();
@@ -377,7 +377,7 @@ void print_winner(){
     message = "draw";
     colcp(white, col);
   }
-  printStringSimple(message, col, conf.bright*sine);
+  printStringSimple(message, col, conf.bright*sineval);
 }
 String verify_token(int token){
   if(wormsconf.tokens[0] == token || wormsconf.tokens[1] == token) return "true";
@@ -507,14 +507,14 @@ void draw_worms(){
         plot_antialiased(xcross-1, ycross-2, wormscol, conf.bright*f, false, false);
         plot_antialiased(xcross+1, ycross-2, wormscol, conf.bright*f, false, false);
         // player color
-        plot_antialiased(xcross, ycross-2, pcol, 0.5*conf.bright*sine, false, false);
+        plot_antialiased(xcross, ycross-2, pcol, 0.5*conf.bright*sineval, false, false);
         
         continue;
       }
       // highlights
       if(wormsconf.worms[k][l].selected && turn_p1 && k == 0){
         // selected marker
-        plot_antialiased(x, y-1, pcol, conf.bright*sine, false, false);
+        plot_antialiased(x, y-1, pcol, conf.bright*sineval, false, false);
         if(wormsconf.state == p1_move){
           projectile* b = &(bullets[wormsconf.worms[k][l].weapon]);
           draw_trajectory(x + look, y - 1, wormsconf.worms[k][l].dy, b->ay, b->vbase, look);
@@ -523,7 +523,7 @@ void draw_worms(){
       
       if(wormsconf.worms[k][l].selected && turn_p2 && k == 1){
         // selected marker
-        plot_antialiased(x, y-1, pcol, conf.bright*sine, false, false);
+        plot_antialiased(x, y-1, pcol, conf.bright*sineval, false, false);
         if(wormsconf.state == p2_move){
           projectile* b = &(bullets[wormsconf.worms[k][l].weapon]);
           draw_trajectory(x + look, y - 1, wormsconf.worms[k][l].dy, b->ay, b->vbase, look);
@@ -568,7 +568,7 @@ void draw_worms(){
           break;
         case laser:
           plot_antialiased(x+look, y-1, orange, conf.bright, false, false);
-          plot_antialiased(x+2*look, y-1, green, conf.bright*sine, false, false);
+          plot_antialiased(x+2*look, y-1, green, conf.bright*sineval, false, false);
           break;
       }
     }
@@ -769,7 +769,7 @@ void damage_calc(float x, float y, uint8_t weapon){
 }
 void lifebar(uint8_t x, uint8_t y, int health){
   float h = (float)health/100.0;
-  if(h < 0.25) h *= sine;
+  if(h < 0.25) h *= sineval;
   else h *= h;
   drawxy(x, y, green, conf.bright*h, false);
 }
