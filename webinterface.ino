@@ -170,7 +170,7 @@ void handleAddWifi(){
       else msg = "{\"remove\": false}";
     }
     else{
-      if (argname < 1 || value < 8){
+      if (argname.length() < 1 || value.length() < 8){
         msg = "{\"add\": false}";
         break;
       }
@@ -326,7 +326,7 @@ void sendscreen(){
 void handlefourier(){
   firstexec = true;
   String msg = "";
-  Serial.println("called handlefourier()");
+  //Serial.println("called handlefourier()");
   
   conf.paintmode = false;
   conf.fouriermode = true;
@@ -376,6 +376,8 @@ void handleworms(){
         value.replace("r", "");
       }
       float dy = value.toFloat();
+      Serial.println("elevation: " + String(dy));
+      if(isnan(dy)) dy = 0.0;
       if(dy > 2.0) dy = 2.0;
       if(dy < -2.0) dy = -2.0;
       move_worm(token, dir, dy);

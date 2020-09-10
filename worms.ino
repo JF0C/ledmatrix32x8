@@ -60,7 +60,6 @@ float sineval = 0.0;
 void render_worms(){
   if(!conf.wormsmode) return;
   sineval = (sin(1.5708*(float)t/300.0)+1.0)/2.0;
-  
   drawmap();
   draw_worms();
   int shooting_done = draw_bullets();
@@ -781,7 +780,7 @@ void damage_calc(float x, float y, uint8_t weapon){
       worm* w1 = &(wormsconf.worms[p][w]);
       float dx = w1->x - x;
       float dy = w1->y - y;
-      float dist = min(min(sqrt(dx*dx + dy*dy), sqrt(dx*dx + (dy-1)*(dy-1))), sqrt(dx*dx + (dy-2)*(dy-2)));
+      float dist = min(min(sqrt(dx*dx + dy*dy), sqrt(dx*dx + (dy+1)*(dy+1))), sqrt(dx*dx + (dy+2)*(dy+2)));
       if(dist > bullets[weapon].radius) continue;
       int h1 = w1->health;
       if(dist < 1) w1->health -= bullets[weapon].damage;
