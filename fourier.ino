@@ -17,18 +17,30 @@ byte sine_data [91]=  {0,
 int amps[64] = {2, 2, 2, 2, 2, 2, 2, 2,
                 4, 2, 2, 8, 2, 2, 2, 2,
                 2, 2, 2, 2, 2, 2, 2, 2,
-                2, 2, 2, 2, 2, 3, 2, 2,
-                2, 2, 2, 2, 2, 2, 2, 2,
-                4, 2, 2, 8, 2, 2, 2, 2,
-                2, 2, 2, 2, 2, 2, 2, 2,
                 2, 2, 2, 2, 2, 3, 2, 2};
 
 int N = 32;
+int p_t[32] = {0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0};
+              
+float sampling_frequency = 1000; //Hz
+
 
 void render_fourier(){  
   if(!conf.fouriermode) return;
-  int maxamps = getMax(amps, N);
-  //Serial.print("Max amplitude: ");
+  
+  for(int i=0; i<32; i++){
+    int p = analogRead(MIC);
+    Serial.println(p);
+    p_t[i] = p-415;
+    delay(1);
+  }
+
+  Full_FFT(p_t, N, sampling_frequency);
+  
+  int maxamps = 2000;//getMax(amps, N);
   //Serial.println(maxamps);
 
   for(int i=0; i<N/2; i++){

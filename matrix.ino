@@ -14,8 +14,7 @@ CRGB paintdata[NUM_LEDS];
 
 ESP8266WebServer server(80);
 File fsUploadFile;
-
-bool firstexec = true;
+int MIC = A0;
 
 unsigned long t = 0;
 uint8_t dt = 0;
@@ -74,6 +73,7 @@ void setup() {
   delay(100);
   Serial.println("matrix");
   FastLED.addLeds<WS2813, PIN1>(s1, NUM_LEDS);
+  pinMode(MIC, INPUT);
   InitFile();
   loadConfig();
   InitWeb();
