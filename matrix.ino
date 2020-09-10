@@ -358,6 +358,17 @@ int printStringSimple(String str, uint8_t* col, float f, int offset = 0){
   return p;
 }
 
+int getMax(int* array, int size)
+{
+  int maximum = array[0];
+  for (int i = 0; i < size; i++)
+  {
+    if (array[i] > maximum) maximum = array[i];
+  }
+  return maximum;
+}
+
+
 String b2s(bool val){
   if(val) return "true";
   return "false";

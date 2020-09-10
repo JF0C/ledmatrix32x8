@@ -71,6 +71,9 @@ $(document).ready(()=>{
 		if(!down) return;
 		sliding(e.clientY);
 	});
+	$('#elevation').click(e=>{
+		sliding(e.clientY);
+	});
 
 	getState();
 });

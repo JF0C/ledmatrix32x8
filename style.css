@@ -251,3 +251,19 @@ body{
 #worms-maps{
 	border: 1px solid cyan;
 }
+.wifi-name{
+	width: 90%;
+	display: inline-block;
+}
+.wifi-remove{
+	display: inline-block;
+	background: red;
+	border: 1px solid black;
+}
+.wifi-entry.selected{
+	background: lightgrey;
+}
+.wifi-label{
+	display: inline-block;
+	width: 30%;
+}
