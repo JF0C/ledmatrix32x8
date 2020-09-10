@@ -311,7 +311,6 @@ void sendscreen(){
 }
 
 void handlefourier(){
-  firstexec = true;
   String msg = "";
   //Serial.println("called handlefourier()");
   
