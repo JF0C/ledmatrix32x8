@@ -215,7 +215,7 @@ function getState(){
 				setContainers('11000');
 				break;
 			case 1:
-				$('#slider-val').css('display': 'none');
+				$('#slider-val').css({'display': 'none'});
 				if($('#player1').hasClass('selected')){
 					setTitle('select worm');
 					setContainers('00110');
@@ -232,14 +232,14 @@ function getState(){
 					setSelectors('0');
 				}
 				else{
-					$('#slider-val').css('display': 'none');
+					$('#slider-val').css({'display': 'none'});
 					setTitle('wait for ' + state.p1_name);
 					setContainers('00000');
 				}
 				break;
 			case 3:
 				setContainers('00000');
-				$('#slider-val').css('display': 'none');
+				$('#slider-val').css({'display': 'none'});
 				if($('#player1').hasClass('selected')){
 					setTitle('wait for hit');
 				}
@@ -248,7 +248,7 @@ function getState(){
 				}
 				break;
 			case 4:
-				$('#slider-val').css('display': 'none');
+				$('#slider-val').css({'display': 'none'});
 				if($('#player1').hasClass('selected')){
 					setTitle('move again ' + (state.t_rest/1000));
 					setContainers('00010');
@@ -264,7 +264,7 @@ function getState(){
 					setContainers('00110');
 				}
 				else{
-					$('#slider-val').css('display': 'none');
+					$('#slider-val').css({'display': 'none'});
 					setTitle('wait for ' + state.p2_name);
 					setContainers('00000');
 				}
@@ -276,14 +276,14 @@ function getState(){
 					setSelectors('1');
 				}
 				else{
-					$('#slider-val').css('display': 'none');
+					$('#slider-val').css({'display': 'none'});
 					setTitle('wait for ' + state.p2_name);
 					setContainers('00000');
 				}
 				break;
 			case 7:
 				setContainers('00000');
-				$('#slider-val').css('display': 'none');
+				$('#slider-val').css({'display': 'none'});
 				if($('#player2').hasClass('selected')){
 					setTitle('wait for hit');
 				}
@@ -292,7 +292,7 @@ function getState(){
 				}
 				break;
 			case 8:
-				$('#slider-val').css('display': 'none');
+				$('#slider-val').css({'display': 'none'});
 				if($('#player2').hasClass('selected')){
 					setTitle('move again ' + (state.t_rest/1000));
 					setContainers('00010');
@@ -303,12 +303,11 @@ function getState(){
 				}
 				break;
 			case 9:
-				$('#slider-val').css('display': 'none');
+				$('#slider-val').css({'display': 'none'});
 				setTitle('setting up');
 				setContainers('11000');
 				setCookie('token0', ';Expires=Wed, 21 Oct 2015 07:28:00 GMT');
 				setCookie('token1', ';Expires=Wed, 21 Oct 2015 07:28:00 GMT');
-				setCookie('token', ';Expires=Wed, 21 Oct 2015 07:28:00 GMT');
 				break;
 		}
 		if(!$('#player1').hasClass('selected') && !$('#player2').hasClass('selected')){
