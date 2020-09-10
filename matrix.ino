@@ -89,6 +89,7 @@ void loop() {
   render_fourier();
   displayText();
   render_pong();
+  render_worms();
   copypaint();
   server.handleClient();
   FastLED.show();
@@ -99,7 +100,7 @@ void loop() {
 }
 
 void displayText(){
-  if(conf.pongmode || conf.paintmode || conf.fouriermode) return;
+  if(conf.pongmode || conf.paintmode || conf.fouriermode || conf.wormsmode) return;
   int printlength = printString(conf.text, 0, 32);
   conf.pulsing = sin((float)t/1000*3.1416*0.5);
   conf.pulsing *= conf.pulsing;
