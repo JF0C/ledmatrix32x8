@@ -257,7 +257,6 @@ void Full_FFT(int in[],byte N,float Frequency)
     1. in[]     : Data array, 
     2. N        : Number of sample (recommended sample size 2,4,8,16,32,64,128...)
     3. Frequency: sampling frequency required as input (Hz)
-
     Quicker, but less accurate: Q_FFT() on top
     Documentation:https://www.instructables.com/member/abhilash_patel/instructables/
     */
