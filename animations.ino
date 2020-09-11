@@ -56,6 +56,8 @@ int kissing(float x, float y, uint8_t* col, float f){
   return width;
 }
 
+// TODO control shape using parameters for width height
+// loudness, frequency, change of frequency, 
 int laughing(float x, float y, uint8_t* col, float f){
   unsigned long tstop = 1000;
   float z = (float)(t%tstop)/(float)tstop;

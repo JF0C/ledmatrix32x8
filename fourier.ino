@@ -25,8 +25,8 @@ int amps[64] = {2, 2, 2, 2, 2, 2, 2, 2,
 
 int N = 32;
 
-void render_fourier(){  
-  if(!conf.fouriermode) return;
+void render_fourier(){
+  if(conf.opmode != fourier) return;
   int maxamps = getMax(amps, N);
   //Serial.print("Max amplitude: ");
   //Serial.println(maxamps);
@@ -43,6 +43,40 @@ void render_fourier(){
       drawxy(N/2+i, 7-j, red, 0.9, false);
     }
   }
+}
+
+// usage: before looping through amps generate nCols and colors:
+void getAudioColors(int* nCols, CRGB* colors){
+  *nCols = 0;
+  for(int k = 0; k < sizeof(conf.audioCols)/sizeof(CRGB); k++){
+    if(conf.audioCols[k].r == 0 && conf.audioCols[k].g == 0 && conf.audioCols[k].b == 0) continue;
+    colors[*nCols].r = conf.audioCols[k].r;
+    colors[*nCols].g = conf.audioCols[k].g;
+    colors[*nCols].b = conf.audioCols[k].b;
+    *nCols = *nCols + 1;
+  }
+}
+// in loop through x vals use this to retrieve color at given x
+void audioColor(int posx, int nCols, CRGB* colors, uint8_t* out_color){
+  if(nCols == 0){
+    out_color[0] = 255;
+    out_color[1] = 255;
+    out_color[2] = 255;
+    return;
+  }
+  if(nCols == 1) {
+    out_color[0] = colors[0].r;
+    out_color[1] = colors[0].g;
+    out_color[2] = colors[0].b;
+    return;
+  }
+  int dist = N/(nCols-1);
+  int nEnd = 1;
+  while(nEnd*dist - 1 < posx) nEnd++;
+  float f = (float)(posx%dist)/(float)dist;
+  out_color[0] =  (1.0-f) * colors[nEnd-1].r + f * colors[nEnd].r;
+  out_color[1] =  (1.0-f) * colors[nEnd-1].g + f * colors[nEnd].g;
+  out_color[2] =  (1.0-f) * colors[nEnd-1].b + f * colors[nEnd].b;
 }
 
 void call_FFT(){

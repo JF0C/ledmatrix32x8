@@ -32,6 +32,14 @@ uint8_t magenta[3] = {255, 0, 255};
 uint8_t rich[3] = {255, 109, 12};
 uint8_t wormscol[3] = {255, 196, 77};
 
+enum opmodes{
+  text,
+  pong,
+  fourier,
+  worms,
+  paint
+};
+
 struct confstruct{
   float bright = 0.4;
   float velocity = 0.05;
@@ -41,16 +49,15 @@ struct confstruct{
   char pw[50] = "r1chl1k35b33r4nd$";
   //char ssid[50] = "FRITZ!Box 7560 MS";
   //char pw[50] = "74507453497218775126";
-  bool pongmode = false;
-  bool paintmode = false;
-  bool wormsmode = false;
-  bool fouriermode = false;
+  opmodes opmode;
   
   String background = "";
   float bgbright = 0.2;
   uint8_t bgr;
   uint8_t bgg;
   uint8_t bgb;
+
+  CRGB audioCols[6];
   
   uint8_t paintr;
   uint8_t paintg;
@@ -96,11 +103,10 @@ void loop() {
   //Serial.println("cycle: " + String(dt));
 
   delay(5);
-
 }
 
 void displayText(){
-  if(conf.pongmode || conf.paintmode || conf.fouriermode || conf.wormsmode) return;
+  if(conf.opmode != text) return;
   int printlength = printString(conf.text, 0, 32);
   conf.pulsing = sin((float)t/1000*3.1416*0.5);
   conf.pulsing *= conf.pulsing;
@@ -368,6 +374,37 @@ int getMax(int* array, int size)
   return maximum;
 }
 
+uint8_t* colorWheel(float percent) {
+  static uint8_t rgb[3];
+  if (percent < 0.0 || percent > 1.0) {
+    rgb[0] = 0;
+    rgb[1] = 0;
+    rgb[2] = 0;
+  }
+  if (percent < 1.0 / 3) {
+    rgb[0] = (uint8_t)(255.0 * 3.0 * 2.0 * (1.0 / 3.0 - percent));
+    rgb[1] = (uint8_t)(255.0 * 3.0 * 2.0 * (percent - 0.0));
+    rgb[2] = 0;
+  }
+  else if (percent < 2.0 / 3) {
+    rgb[0] = 0;
+    rgb[1] = (uint8_t)(255.0 * 3.0 * 2.0 * (2.0 / 3.0 - percent));
+    rgb[2] = (uint8_t)(255.0 * 3.0 * 2.0 * (percent - 1.0 / 3.0));
+  }
+  else {
+    rgb[0] = (uint8_t)(255.0 * 3.0 * 2.0 * (percent - 2.0 / 3.0));
+    rgb[1] = 0;
+    rgb[2] = (uint8_t)(255.0 * 3.0 * 2.0 * (1.0 - percent));
+  }
+  return rgb;
+}
+
+void colorWheeltoCRGB(float percent, CRGB* target){
+  uint8_t* rgb = colorWheel(percent);
+  target->r = rgb[0];
+  target->g = rgb[1];
+  target->b = rgb[2];
+}
 
 String b2s(bool val){
   if(val) return "true";
