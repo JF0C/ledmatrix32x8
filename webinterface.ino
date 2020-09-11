@@ -177,6 +177,7 @@ void showconfig(){
 
 void handlepong(){
   String msg = "";
+  if(conf.opmode != pong) conf.opmode = pong;
   for (int i = 0; i < server.args(); i++) {
     String argname = server.argName(i);
     String value = server.arg(i);
