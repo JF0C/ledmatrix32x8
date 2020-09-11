@@ -1,16 +1,15 @@
 void activate_pong(bool p1){
-  if(conf.pongmode) return;
+  if(conf.opmode != pong) return;
   if(p1) pconf.player1 = true;
   else pconf.player2 = true;
   if(pconf.player1 && pconf.player2){
-    conf.pongmode = true;
-    conf.paintmode = false;
+    conf.opmode = pong;
     pconf.points_p1 = 0;
     pconf.points_p2 = 0;
     initball(0);
     randomSeed(t);
   }
-  Serial.println("Pongmode: " + String(conf.pongmode));
+  Serial.println("Pongmode");
 }
 
 void initball(int winner){
@@ -50,7 +49,7 @@ void move_bat(bool p1, bool left){
 }
 
 void render_pong(){
-  if(!conf.pongmode) return;
+  if(conf.opmode != pong) return;
   if(pconf.tstart > t && pconf.vy == 0){
     drawgame();
     return;

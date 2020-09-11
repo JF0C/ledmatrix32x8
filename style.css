@@ -107,6 +107,7 @@ body{
 }
 .appsheader{
 	margin-top: 15px;
+	margin-bottom: 5px;
 	border-bottom: 1px solid black;
 }
 #paint-menu{
@@ -263,4 +264,17 @@ body{
 .wifi-label{
 	display: inline-block;
 	width: 30%;
+}
+.cb-container{
+	display: inline-block;
+	padding: 5px;
+	border: 1px solid black;
+	border-radius: 5px;
+	background: black;
+}
+.fbutton{
+	background: white;
+}
+.cb-label{
+	background: white;
 }

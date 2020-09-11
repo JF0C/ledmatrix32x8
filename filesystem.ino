@@ -60,7 +60,7 @@ String readFile(String fname){
   return result;
 }
 
-StaticJsonDocument<600> json;
+StaticJsonDocument<1024> json;
 bool writeConfig(String key, String data){
   return writeAnyConfig(key, data, F("/config.json"), -1);
 }
@@ -141,6 +141,14 @@ bool removeJsonEntry(String fname, String key){
   return true;
 }
 
+void writeAudioCols(){
+  String data = "";
+  for(uint8_t k = 0; k < sizeof(conf.audioCols)/sizeof(CRGB); k++){
+    data += String(conf.audioCols[k].r) + "," + String(conf.audioCols[k].g) + "," + String(conf.audioCols[k].b) + ";";
+  }
+  writeConfig("audioCols", data);
+}
+
 void loadConfig(){
   File file = SPIFFS.open(F("/config.json"), "r");
   if(!file){
@@ -161,6 +169,7 @@ void loadConfig(){
   conf.bgb = json["bgb"].as<uint8_t>();
   conf.bgbright = json["bgbright"].as<float>();
   conf.paintr = json["paintr"].as<uint8_t>();
+  loadAudioCols(json["audioCols"].as<String>());
 
   if(!wStr2CharArr(json["ssid"].as<String>(), &conf.ssid[0], 50))
     Serial.println(F("ERROR: wifi name too long"));
@@ -174,6 +183,20 @@ void loadConfig(){
  
 
   file.close();
+}
+
+void loadAudioCols(String data){
+  int k = 0;
+  while(data.indexOf(";") > 0){
+    String tempcol = data.substring(0, data.indexOf(";"));
+    conf.audioCols[k].r = tempcol.substring(0, tempcol.indexOf(",")).toInt();
+    tempcol = tempcol.substring(tempcol.indexOf(",") + 1);
+    conf.audioCols[k].g = tempcol.substring(0, tempcol.indexOf(",")).toInt();
+    tempcol = tempcol.substring(tempcol.indexOf(",") + 1);
+    conf.audioCols[k].b = tempcol.toInt();
+    data = data.substring(data.indexOf(";") + 1);
+    k++;
+  }
 }
 
 void removeFile(String fname){
@@ -195,15 +218,65 @@ void loadPongConf(){
   pconf.name_p2 = json["name_p2"].as<String>();
 }
 
-String readConfig(String key){
-  File file = SPIFFS.open("/config.json", "r");
+bool tryOtherWifis(){
+  File file = SPIFFS.open("/wificonfig.json", "r");
   if(!file){
-    Serial.println(F("Error: could not open config file"));
+    Serial.println(F("Error: could not open file wificonfig.json"));
+    return false;
+  }
+  String ssid, pw;
+  char c;
+  int readstate = 0;
+  while(file.available()){
+    c = file.read();
+    switch(readstate){
+      case 0: // continue to ssid
+        if(c == '"') readstate = 1; 
+        break;
+      case 1: // read ssid
+        if(c == '"') {
+          readstate = 2;
+          break;
+        }
+        ssid += c;
+        break;
+      case 2: // continue to pw
+        if(c == '"') readstate = 3;
+        break;
+      case 3: // read pw
+        if(c == '"'){
+          readstate = 0;
+          WiFi.begin(ssid.c_str(), pw.c_str());
+          delay(1000);
+          if(WiFi.status() == WL_CONNECTED){
+            Serial.print(F("wifi: trying ssid: ")); Serial.print(ssid); Serial.print(F(" with pw: ")); Serial.println(pw);
+            
+            return true;
+          }
+          ssid = "";
+          pw = "";
+          break;
+        }
+        pw += c;
+        break;
+    }
+  }
+  return false;
+}
+
+String readConfig(String key){
+  return readAnyConfig(key, "/config.json");
+}
+
+String readAnyConfig(String key, String fname){
+  File file = SPIFFS.open(fname, "r");
+  if(!file){
+    Serial.print(F("Error: could not open file ")); Serial.println(fname);
     return "";
   }
   DeserializationError err = deserializeJson(json, file);
   if(err){
-    Serial.println(F("Error: could not deserialize config"));
+    Serial.print(F("Error: could not deserialize ")); Serial.println(fname);
     return "";
   }
   String res = json[key];
@@ -216,24 +289,18 @@ bool handleFileRead(String path) { // send the right file to the client (if it e
   if(path.endsWith("/")) path += "index.html";           // If a folder is requested, send the index file
   if(path == "/index.html"){
     loadBackground();
-    conf.paintmode = false;
-    conf.pongmode = false;
-    conf.fouriermode = false;
-    conf.wormsmode = false;
+    conf.opmode = text;
   }
   if(path == "/paint.html"){
-    conf.paintmode = true;
-    conf.pongmode = false;
-    conf.fouriermode = false;
-    conf.wormsmode = false;
+    conf.opmode = paint;
     loadpaint("bu/temp");
   }
   if(path == "/worms.html"){
-    if(!conf.wormsmode) startWorms();
-    conf.paintmode = false;
-    conf.pongmode = false;
-    conf.fouriermode = false;
-    conf.wormsmode = true;
+    if(conf.opmode != worms) startWorms();
+    conf.opmode = worms;
+  }
+  if(path == "/fourier.html"){
+    conf.opmode = fourier;
   }
   String contentType = getContentType(path);             // Get the MIME type
   String pathWithGz = path + ".gz";

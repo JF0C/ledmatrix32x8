@@ -1,16 +1,1 @@
-{
-"bright":"0.10",
-"velocity":"-4.1",
-"text":"hello",
-"lasttexts":"[\"hello\"]",
-"bgbright":"0.22",
-"background":"<color>",
-"bgr":"92",
-"bgg":"72",
-"bgb":"29",
-"paintr": "123",
-"paintg": "123",
-"paintb": "123",
-"painthard": "20",
-"paintsize": "20"
-}
+{"bright":"0.06","velocity":"-2.9","text":"hello <roty><rich><RICH>","lasttexts":"[\"hello <rotx><rich><RICH>\",\"hello <roty><rich><RICH>\"]","bgbright":"0.08","background":"","bgr":"216","bgg":"108","bgb":"77","paintr":"255","paintg":"255","painthard":"52","paintsize":"20","paintb":"255","painterase":"0","ssid":"R.I.C.H.","pw":"r1chl1k35b33r4nd$","audioCols":["0,0,0","0,0,0","0,0,0","0,0,0","0,0,0","0,0,0"]}

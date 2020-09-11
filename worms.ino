@@ -55,7 +55,7 @@ const unsigned long tafter = 5000;
 float sineval = 0.0;
 // main call for worms in every iteration of loop
 void render_worms(){
-  if(!conf.wormsmode) return;
+  if(conf.opmode != worms) return;
   sineval = (sin(1.5708*(float)t/300.0)+1.0)/2.0;
   drawmap();
   draw_worms();
