@@ -311,7 +311,6 @@ void sendscreen(){
 }
 
 void handlefourier(){
-  firstexec = true;
   String msg = "";
   //Serial.println("called handlefourier()");
   
@@ -354,7 +353,12 @@ void handlefourier(){
       }
     }
   }
+<<<<<<< HEAD
   server.send(200, "text/plain", msg); 
+=======
+  server.send(200, "text/plain", "Sucksess"); 
+  //call_FFT();
+>>>>>>> Cedric
 }
 
 void handleframerate(){
