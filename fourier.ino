@@ -29,7 +29,7 @@ float sampling_frequency = 1000; //Hz
 
 
 void render_fourier(){  
-  if(!conf.fouriermode) return;
+  if(conf.opmode != fourier) return;
   
   for(int i=0; i<32; i++){
     int p = analogRead(MIC);

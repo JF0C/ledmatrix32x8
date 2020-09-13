@@ -302,6 +302,10 @@ bool handleFileRead(String path) { // send the right file to the client (if it e
   if(path == "/fourier.html"){
     conf.opmode = fourier;
   }
+  if(path == "/maze.html"){
+    conf.opmode = maze;
+    startMaze();
+  }
   String contentType = getContentType(path);             // Get the MIME type
   String pathWithGz = path + ".gz";
   if (SPIFFS.exists(pathWithGz) || SPIFFS.exists(path)) { // If the file exists, either as a compressed archive, or normal

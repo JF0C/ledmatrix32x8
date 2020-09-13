@@ -952,16 +952,21 @@ int letter(float dx, float dy, uint8_t* color, float f, String letter){
   int dyi = floor(dy);
   float dxf = dx - (float)dxi;
   float dyf = dy - (float)dyi;
-  for(int y = 0; y < 8; y++){
-    for(int x = 0; x < width; x++){
-      arr2[x][y] += (1.0-dxf)*(1.0-dxf)*(1.0-dyf)*(1.0-dyf)*(float)arr[x][y];
-      arr2[x+1][y] += (1.0-dyf)*(1.0-dyf)*dxf*dxf*(float)arr[x][y];
-      arr2[x][y+1] += (1.0-dxf)*(1.0-dxf)*dyf*dyf*(float)arr[x][y];
-      arr2[x+1][y+1] += dxf*dxf*dyf*dyf*(float)arr[x][y];
+  float f00 = (1.0-dxf)*(1.0-dxf)*(1.0-dyf)*(1.0-dyf);
+  float f10 = (1.0-dyf)*(1.0-dyf)*dxf*dxf;
+  float f01 = (1.0-dxf)*(1.0-dxf)*dyf*dyf;
+  float f11 = dxf*dxf*dyf*dyf;
+  for(int x = 0; x < width; x++){
+    for(int y = 0; y < 8; y++){
+      if(arr[x][y] == 0) continue;
+      arr2[x][y] += f00*(float)arr[x][y];
+      arr2[x+1][y] += f10*(float)arr[x][y];
+      arr2[x][y+1] += f01*(float)arr[x][y];
+      arr2[x+1][y+1] += f11*(float)arr[x][y];
     }
   }
-  for(int y = 0; y < 8; y++){
-    for(int x = 0; x < width+1; x++){
+  for(int x = 0; x < width+1; x++){
+    for(int y = 0; y < 8; y++){
       drawxy(x + dxi, y + dyi, color, arr2[x][y]*f, false);
     }
   }
@@ -1091,16 +1096,20 @@ int smiley(float dx, float dy, uint8_t* color, float f, String emoji, uint8_t* r
   int dyi = floor(dy);
   float dxf = dx - (float)dxi;
   float dyf = dy - (float)dyi;
+  float f00 = (1.0-dxf)*(1.0-dxf)*(1.0-dyf)*(1.0-dyf);
+  float f10 = (1.0-dyf)*(1.0-dyf)*dxf*dxf;
+  float f01 = (1.0-dxf)*(1.0-dxf)*dyf*dyf;
+  float f11 = dxf*dxf*dyf*dyf;
   for(int y = 0; y < 8; y++){
     for(int x = 0; x < 8; x++){
-      arr2[x][y] += (1.0-dxf)*(1.0-dyf)*(1.0-dxf)*(1.0-dyf)*(float)arr[x][y];
-      arr2[x+1][y] += (1.0-dyf)*dxf*(1.0-dyf)*dxf*(float)arr[x][y];
-      arr2[x][y+1] += (1.0-dxf)*dyf*(1.0-dxf)*dyf*(float)arr[x][y];
-      arr2[x+1][y+1] += dxf*dyf*dxf*dyf*(float)arr[x][y];
+      arr2[x][y] += f00*(float)arr[x][y];
+      arr2[x+1][y] += f10*(float)arr[x][y];
+      arr2[x][y+1] += f01*(float)arr[x][y];
+      arr2[x+1][y+1] += f11*(float)arr[x][y];
     }
   }
-  for(int y = 0; y < 8; y++){
-    for(int x = 0; x < 9; x++){
+  for(int x = 0; x < 9; x++){
+    for(int y = 0; y < 8; y++){
       drawxy(x + dxi, y + dyi, color, arr2[x][y]*f, false);
     }
   }

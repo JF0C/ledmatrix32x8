@@ -30,13 +30,16 @@ uint8_t cyan[3] = {0, 255, 255};
 uint8_t magenta[3] = {255, 0, 255};
 uint8_t rich[3] = {255, 109, 12};
 uint8_t wormscol[3] = {255, 196, 77};
+uint8_t blank[3] = {0,0,0};
+float sineval = 0.0;
 
 enum opmodes{
   text,
   pong,
   fourier,
   worms,
-  paint
+  paint,
+  maze
 };
 
 struct confstruct{
@@ -89,22 +92,23 @@ void setup() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
   dt = millis() - t;
   t = millis();
+  sineval = (sin(1.5708*(float)t/300.0)+1.0)/2.0;
   clear_matrix();
   render_fourier();
   displayText();
   render_pong();
   render_worms();
+  render_maze();
   copypaint();
   server.handleClient();
   FastLED.show();
-  //Serial.println("cycle: " + String(dt));
 
   delay(5);
 }
 
+// TODO add text buffer [200][8][8] = [200px in x][8px in height][8bits grayscale]
 void displayText(){
   if(conf.opmode != text) return;
   int printlength = printString(conf.text, 0, 32);
@@ -263,6 +267,7 @@ bool ismarkup(int l, int* k, String pattern, String text){
 void drawxy(int x, int y, uint8_t* color, float f, bool overridedraw){
   if(x >= 32 || y >= 8) return;
   if(x < 0 || y < 0) return;
+  //if(color[0] == 0 && color[1] == 0 && color[2] == 0) return;
   if(y%2 == 0){
     draw_pixel(y*32 + x, color, f, overridedraw);
   }
@@ -354,14 +359,6 @@ bool wStr2CharArr(String str, char* chr, int len){
     if(k < l) chr[k] = str[k];
     else chr[k] = 0;
   }
-}
-
-int printStringSimple(String str, uint8_t* col, float f, int offset = 0){
-  int p = offset;
-  for(int k = 0; k < str.length(); k++){
-    p += letter(p, 0, col, f, String(str[k]))+1;
-  }
-  return p;
 }
 
 int getMax(int* array, int size)

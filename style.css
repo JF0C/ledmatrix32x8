@@ -50,6 +50,8 @@ body{
 }
 .sel{
 	border: 1px solid black;
+	font-size: 23px;
+	margin: 3px;
 }
 .radio3{
 	border: 1px solid black;
@@ -281,4 +283,31 @@ body{
 }
 .cb-label{
 	background: white;
+}
+.maze-player{
+	display: inline-block;
+	border: 1px solid black;
+	padding: 3px;
+}
+.maze-control{
+	height: 100px;
+	width: 100px;
+	border: 1px solid black;
+	border-radius: 10px;
+	display: inline-block;
+	margin: 5px;
+}
+#single-player.selected{
+	background: green;
+}
+.applink{
+	display: inline-block;
+    width: 100px;
+    border: 1px solid black;
+    height: 100px;
+    text-align: center;
+    font-size: 25px;
+    line-height: 100px;
+    vertical-align: middle;
+    margin: 5px;
 }

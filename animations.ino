@@ -72,6 +72,8 @@ int laughing(float x, float y, uint8_t* col, float f){
 
 void plot_antialiased(float x, float y, uint8_t* col, float intens, bool linear, bool ov){
   if(x < 0 || x > 31 || y < 0 || y > 7) return;
+  // from Ail
+  //if(col[0] == 0 && col[1] == 0 && col[2] == 0) return;
   int nx = floor(x);
   int ny = floor(y);
   float fx = x - (float)nx;
