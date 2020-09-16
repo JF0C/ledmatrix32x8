@@ -53,8 +53,8 @@ struct wormsconfiguration{
   bool map_selected;
 }wormsconf;
 
-const unsigned long tmove = 10000;
-const unsigned long tafter = 5000;
+const unsigned long tmove = 15000;
+const unsigned long tafter = 8000;
 // main call for worms in every iteration of loop
 void render_worms(){
   if(conf.opmode != worms) return;
@@ -175,7 +175,7 @@ bool isSolid(uint8_t x, uint8_t y){
   if(x < 0 || x > 31) return false;
   if(y > 7 || y < 0) return true;
   colorAt(x, y, &col[0], &paintdata[0]);
-  if((col[0] + col[1] + col[2]) > (float)400.0) return true;
+  if((col[0] + col[1] + col[2]) > (float)330.0) return true;
   return false;
 }
 
@@ -270,6 +270,7 @@ void bulletcp(int src, int dst, int dir, float dy, float x, float y){
 }
 
 void move_worm(int token, int dir, float y){
+  const float step_width = 1.0;
   int player = playerFromToken(token);
   if(player == -1) return;
   if(player == 0 && (wormsconf.state != p1_move && wormsconf.state != p1_move_after)) return;
@@ -282,8 +283,8 @@ void move_worm(int token, int dir, float y){
     wormsconf.worms[player][worm].look_left = true;
     int x = ceil(wormsconf.worms[player][worm].x);
     int y = wormsconf.worms[player][worm].y;
-    if(!isSolid(x-1, y-1) && !isSolid(x-1, y-2) && !(isSolid(x-1, y-3) && isSolid(x-1, y)) && x >= 0.25){
-      wormsconf.worms[player][worm].x -= 0.25;
+    if(!isSolid(x-1, y-1) && !isSolid(x-1, y-2) && !(isSolid(x-1, y-3) && isSolid(x-1, y)) && x >= step_width){
+      wormsconf.worms[player][worm].x -= step_width;
     }
     x = floor(wormsconf.worms[player][worm].x);
     if(isSolid(x-1, y)) wormsconf.worms[player][worm].y -= 1;
@@ -293,8 +294,8 @@ void move_worm(int token, int dir, float y){
     wormsconf.worms[player][worm].look_left = false;
     int x = floor(wormsconf.worms[player][worm].x);
     int y = wormsconf.worms[player][worm].y; 
-    if(!isSolid(x+1, y-1) && !isSolid(x+1, y-2) && !(isSolid(x+1, y-3) && isSolid(x+1, y)) && x <= 30.75){
-      wormsconf.worms[player][worm].x += 0.25;
+    if(!isSolid(x+1, y-1) && !isSolid(x+1, y-2) && !(isSolid(x+1, y-3) && isSolid(x+1, y)) && x <= 31-step_width){
+      wormsconf.worms[player][worm].x += step_width;
     }
     x = ceil(wormsconf.worms[player][worm].x);
     if(isSolid(x-1, y)) wormsconf.worms[player][worm].y -= 1;
@@ -463,13 +464,13 @@ int initMap(int token, String paint){
   bullets[rifle].alive = false;
   bullets[rifle].radius = 1.0;
   bullets[rifle].destruct = 0.4;
-  bullets[rifle].vbase = 10;
-  bullets[rifle].ay = 0.2; 
+  bullets[rifle].vbase = 7;
+  bullets[rifle].ay = 0.2;
       
   bullets[laser].alive = false;
   bullets[laser].damage = 20;
   bullets[laser].radius = 0.5;
-  bullets[laser].destruct = 0.9;
+  bullets[laser].destruct = 0.5;
   bullets[laser].vbase = 10;
   bullets[laser].ay = 0;
   
@@ -600,8 +601,9 @@ void worm_fall(int p, int w){
     fallen += 1.0;
   }
   if(wormsconf.worms[p][w].y > 7.0) wormsconf.worms[p][w].y = 7.0;
-  if(fallen > 1)
-    wormsconf.worms[p][w].health -= (fallen-1)*8;
+  if(fallen < 1) return;
+  wormsconf.worms[p][w].health -= (fallen-1)*8;
+  Serial.println("fall damage to worm " + String(p) + "." + String(w) + ": " + String((fallen-1)*8));
 }
 
 void draw_trajectory(float x, float y, float dy, float ay, float vbase, int dir){
@@ -784,7 +786,7 @@ void damage_calc(float x, float y, uint8_t weapon){
       worm* w1 = &(wormsconf.worms[p][w]);
       float dx = w1->x - x;
       float dy = w1->y - y;
-      float dist = min(min(sqrt(dx*dx + dy*dy), sqrt(dx*dx + (dy+1)*(dy+1))), sqrt(dx*dx + (dy+2)*(dy+2)));
+      float dist = min(min(sqrt(dx*dx + dy*dy), sqrt(dx*dx + (dy-1)*(dy-1))), sqrt(dx*dx + (dy-2)*(dy-2)));
       if(dist > bullets[weapon].radius) continue;
       int h1 = w1->health;
       if(dist < 1) w1->health -= bullets[weapon].damage;
@@ -821,7 +823,7 @@ void paint_reduce(float x, float y, float reduce_by){
 
 void drawmap(){
   if(wormsconf.state == game_over) return;
-  float f2 = 1.0;
+  float f2 = 0.7;
   if(wormsconf.state == game_start) f2 = 0.3;
   for(int k = 0; k < NUM_LEDS; k++){
     uint8_t col[3] = {paintdata[k].g, paintdata[k].r, paintdata[k].b};

@@ -74,10 +74,12 @@ $(document).ready(()=>{
 	$('#elevation').click(e=>{
 		sliding(e.clientY);
 	});
+	setSlider(0);
 
 	getState();
 });
 
+let canSendSlider = false;
 function sliding(y){
 	let sliderheight = parseFloat($('#slider-knob').css('height'));
 	let starty = $('#elevation').position().top;
@@ -93,7 +95,13 @@ function sliding(y){
 	let value = sliderScale(slidertop/maxtop);
 	if(isNaN(value)) 
 		console.log('slider value isnan!')
-	$('#slider-val').html('' + value);
+	else
+		$('#slider-val').html('' + value);
+	if(!canSendSlider)setTimeout(()=>canSendSlider=true, 200);
+	else{
+		move('');
+		canSendSlider = false;
+	}
 }
 
 function setSlider(val){
@@ -117,7 +125,7 @@ function sendNamePlayer(){
 	}
 	if(state !== undefined && state.state != 0){
 		sendWorms({'verify': getCookie('token' + msg)}, e=>{
-			if(e.verify) decentAlert('welcome back ' + playername());
+			if(e.verify) decentAlert('welcome back ' + playername(msg));
 			else setCookie('token' + msg, ';Expires=Wed, 21 Oct 2015 07:28:00 GMT');
 		});
 		return;
@@ -227,7 +235,7 @@ function getState(){
 				break;
 			case 2:
 				if($('#player1').hasClass('selected')){
-					setTitle('move/shoot ' + (state.t_rest/1000));
+					setTitle('move/shoot<br>' + (state.t_rest/1000).toFixed(2));
 					setContainers('00011');
 					setSelectors('0');
 				}
@@ -250,7 +258,7 @@ function getState(){
 			case 4:
 				$('#slider-val').css({'display': 'none'});
 				if($('#player1').hasClass('selected')){
-					setTitle('move again ' + (state.t_rest/1000));
+					setTitle('move again<br>' + (state.t_rest/1000).toFixed(2));
 					setContainers('00010');
 				}
 				else{
@@ -271,7 +279,7 @@ function getState(){
 				break;
 			case 6:
 				if($('#player2').hasClass('selected')){
-					setTitle('move/shoot ' + (state.t_rest/1000));
+					setTitle('move/shoot<br>' + (state.t_rest/1000).toFixed(2));
 					setContainers('00011');
 					setSelectors('1');
 				}
@@ -294,7 +302,7 @@ function getState(){
 			case 8:
 				$('#slider-val').css({'display': 'none'});
 				if($('#player2').hasClass('selected')){
-					setTitle('move again ' + (state.t_rest/1000));
+					setTitle('move again<br>' + (state.t_rest/1000).toFixed(2));
 					setContainers('00010');
 				}
 				else{
@@ -375,7 +383,9 @@ function sendWorms(data, after){
 
 function sendWormsC(data, after){
 	let token = getToken();
-	if(!(parseInt(token) > 0)){
+	if(!(parseInt(token) > 0) && (state === undefined || (
+		(state.p1_name === undefined || state.p1_name == "") &&
+		(state.p2_name === undefined || state.p2_name == "")))){
 		decentAlert('set player and name first!');
 	}
 	let dc = {'token': token};
