@@ -32,16 +32,21 @@ $(document).ready(()=>{
 		$(e.target).parent().css('background', 'black');
 	});
 	$.ajax({
-		'url': '/config.json',
+		'url': '/fourierconfig.json',
 		'method': 'GET',
 		'dataType': 'json'
 	}).done(e=>{
-		let cols = e.audioCols.split(';');
+		let cols = e.colors.split(';');
 		for(let k = 0; k < 6; k++){
 			let rgb = cols[k].split(',');
 			if(rgb.length != 3) continue;
 			$('#color' + k).css('background', '#' + getColorRgb(rgb[0], rgb[1], rgb[2]));
 		}
+		$('#min-freq').val(e.minfreq);
+		$('#max-freq').val(e.maxfreq);
+		$('#scale').val(parseFloat(e.scale)*100);
+		if(e.mirror == "true") $('#mirror-switch-thumb').addClass('active');
+		else $('#mirror-switch-thumb').removeClass('active');
 	}).fail(e=>console.log(e));
 	$('#mirror-switch').click(()=>{
 		$('#mirror-switch-thumb').toggleClass('active');
@@ -52,6 +57,7 @@ $(document).ready(()=>{
 	});
 	$('#min-freq').change(e=>sendFourier({'minfreq': $(e.target).val()}));
 	$('#max-freq').change(e=>sendFourier({'maxfreq': $(e.target).val()}));
+	$('#scale').change(e=>sendFourier({'scale': (parseFloat($(e.target).val())/100)}));
 });
 
 function sendFourier(obj, after){

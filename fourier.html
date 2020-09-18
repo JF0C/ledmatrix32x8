@@ -62,12 +62,17 @@
 	<div id="control-container">
 		<div>
 			<div class="slider-label">min freq:</div>
-			<input type="range" id="min-freq" min="0" max="500">
+			<input type="range" class="fourier-slider" id="min-freq" min="0" max="500">
 		</div>
 		<div>
 			<div class="slider-label">max freq:</div>
-			<input type="range" id="max-freq" min="500" max="6000"></div>
-		<div id="mirror-switch"><div id="mirror-switch-thumb" style="color:white;">mirror</div></div>
+			<input type="range" class="fourier-slider" id="max-freq" min="500" max="6000">
+		</div>
+		<div>
+			<div class="slider-label">scale:</div>
+			<input type="range" class="fourier-slider" id="scale" min="0" max="100">
+		</div>
+		<div id="mirror-switch">1&nbsp&nbsp0<div id="mirror-switch-thumb">mirror</div></div>
 	</div>
 </body>
 </html>

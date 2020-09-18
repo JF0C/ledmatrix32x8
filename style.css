@@ -318,15 +318,29 @@ body{
 #mirror-switch{
 	width: 100px;
 	height: 50px;
+	font-size: 44px;
 	border: 1px solid black;
+	text-align: center;
 }
 #mirror-switch-thumb{
 	width: 50px;
 	height: 50px;
 	position: relative;
+	font-size: 16px;
+	top: -51px;
 	left: 0px;
+	line-height: 50px;
+	vertical-align: middle;
 	background: black;
+	color: white;
 }
 #mirror-switch-thumb.active{
 	left: 50px;
+}
+.slider-label{
+	width: 200px;
+	display: inline-block;
+}
+.fourier-slider{
+	width: 500px;
 }

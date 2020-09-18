@@ -360,16 +360,11 @@ void handlefourier(){
     }
     else if(argname == "mirror"){
       msg = "mirror: " + value;
-      if(value == "true") {
-        fconf.mirror = true;
-        writeAudioConfig(argname, value);
-      }
-      else if(value == "false"){
-        fconf.mirror = false;
+      if(value == "true" || value == "false") {
+        fconf.mirror = value == "true";
         writeAudioConfig(argname, value);
       }
       else msg = "error: invalid argument for mirror";
-      
     }
     else if(argname == "minfreq"){
       fconf.minfreq = boundedInt(value, 0, 500);
@@ -381,12 +376,25 @@ void handlefourier(){
       writeAudioConfig(argname, String(fconf.maxfreq));
       msg = argname + ": " + fconf.maxfreq;
     }
+    else if(argname == "scale"){
+      fconf.scale = boundedFloat(value, 0.0, 1.0);
+      writeAudioConfig(argname, String(fconf.scale));
+      msg = argname + ": " + fconf.scale;
+    }
   }
   server.send(200, "text/plain", msg);
 }
 
 int boundedInt(String value, int minval, int maxval){
   int res = value.toInt();
+  res = min(res, maxval);
+  res = max(res, minval);
+  return res;
+}
+
+float boundedFloat(String value, float minval, float maxval){
+  float res = value.toFloat();
+  if(isnan(res)) return 0;
   res = min(res, maxval);
   res = max(res, minval);
   return res;

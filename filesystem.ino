@@ -199,8 +199,9 @@ void loadFourierConf(){
   loadAudioCols(json["colors"].as<String>());
   fconf.minfreq = json["minfreq"].as<int>();
   fconf.maxfreq = json["maxfreq"].as<int>();
-  fconf.mirror = json["mirror"].as<bool>();
-  
+  fconf.mirror = json["mirror"].as<String>() == "true";
+  fconf.scale = json["scale"].as<float>();
+  if(isnan(fconf.scale)) fconf.scale = 0.5;
   file.close();
 }
 
