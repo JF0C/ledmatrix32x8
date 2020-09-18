@@ -93,10 +93,10 @@ void readMIC(){
 
   for(int i=0; i<N; i++){  
     if(fconf.mirror){
-      p_t[i] = (int)(((float)p_t[i]-(mean_p/(float)N))*hann[2*i]);
+      p_t[i] = (int)(((float)p_t[i]-(mean_p/(float)N))*hann_win[2*i]);
     }
     else{
-      p_t[i] = (int)(((float)p_t[i]-(mean_p/(float)N))*hann[i]);
+      p_t[i] = (int)(((float)p_t[i]-(mean_p/(float)N))*hann_win[i]);
     }
   }
 }
