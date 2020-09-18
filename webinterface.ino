@@ -26,7 +26,6 @@ void InitWeb(){
   server.on(F("/listfiles"), HTTP_GET, listfiles);
   server.on(F("/changefile"), HTTP_POST, handleFileChange);
   server.on(F("/worms"), HTTP_POST, handleworms);
-  server.on(F("/maze"), HTTP_POST, handlemaze);
   server.on(F("/addwifi"), HTTP_POST, handleAddWifi);
   server.on(F("/upload"), HTTP_GET,[](){
     server.send(200, "text/html", F("<form method=\"post\" enctype=\"multipart/form-data\"><input type=\"file\" name=\"name\"><input class=\"button\" type=\"submit\" value=\"Upload\"></form>"));
@@ -40,8 +39,7 @@ void InitWeb(){
       server.send(404, "text/plain", "404: Not Found"); // otherwise, respond with a 404 (Not Found) error
   });
   server.begin();
-  Serial.println("[ERROR] failed to connect");
-  else Serial.println("wifi started");
+  Serial.println("wifi started");
 }
 
 void handleset(){
@@ -357,7 +355,7 @@ void handlefourier(){
       }
     }
   }
-  server.send(200, "text/plain", msg);
+  server.send(200, "text/plain", msg); 
 }
 
 void handleframerate(){
@@ -389,7 +387,7 @@ void handleworms(){
         value.replace("r", "");
       }
       float dy = value.toFloat();
-      //Serial.println("elevation: " + String(dy));
+      Serial.println("elevation: " + String(dy));
       if(isnan(dy)) dy = 0.0;
       if(dy > 2.0) dy = 2.0;
       if(dy < -2.0) dy = -2.0;
@@ -443,27 +441,4 @@ void handleworms(){
   }
   msg += "}";
   server.send(200, "text/json", msg);
-}
-
-void handlemaze(){
-  String msg = "";
-  for (int i = 0; i < server.args(); i++) {
-    String argname = server.argName(i);
-    String value = server.arg(i);
-    if(argname == "player1"){
-      mconf.p1_joined = true;
-      int m = value.toInt();
-      if(m == 5) setSinglePlayer(true);
-      else setSinglePlayer(false);
-      mconf.moving[0] = m;
-      msg = argname + " moved " + value;
-    }
-    else if(argname == "player2"){
-      mconf.p2_joined = true;
-      int m = value.toInt();
-      mconf.moving[1] = m;
-      msg = argname + " moved " + value;
-    }
-  }
-  server.send(200, "text/plain", msg);
 }
