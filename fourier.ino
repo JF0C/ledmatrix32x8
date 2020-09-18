@@ -15,6 +15,16 @@ int p_t[64] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
               0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
               0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
+float hann_win[64] = {0, 0.0025, 0.0099, 0.0222, 0.0393, 0.0609, 0.0869, 0.1170, 0.1509, 
+                  0.1883, 0.2287, 0.2719, 0.3173, 0.3646, 0.4132, 0.4626, 0.5125,
+                  0.5622, 0.6113, 0.6592, 0.7056, 0.7500, 0.7919, 0.8308, 0.8665,
+                  0.8986, 0.9266, 0.9505, 0.9698, 0.9845, 0.9944, 0.9994, 0.9994,
+                  0.9944, 0.9845, 0.9698, 0.9505, 0.9266, 0.8986, 0.8665, 0.8308,
+                  0.7919, 0.7500, 0.7056, 0.6592, 0.6113, 0.5622, 0.5125, 0.4626,
+                  0.4132, 0.3646, 0.3173, 0.2719, 0.2287, 0.1883, 0.1509, 0.1170,
+                  0.0869, 0.0609, 0.0393, 0.0222, 0.0099, 0.0025, 0};
+
+
 int N = 64;
 
 int samplefreq = 2*fconf.maxfreq;
@@ -40,14 +50,14 @@ void render_fourier(){
   
   if(fconf.mirror){
     for(int i=0; i<N/2; i++){
-      int nrleds = floor((float) amps[i]/ (float) maxamps * 8);
+      int nrleds = floor(fconf.scale*(float) amps[i]/ (float) maxamps * 8);
       audioColor(i, cols, colors, col_color);
       for(int j = 0; j<nrleds; j++){
         drawxy(N/2-i-1, 7-j, col_color, conf.bright, false);
       }
     }
     for(int i=0; i<N/2; i++){
-      int nrleds = floor((float) amps[i]/ (float) maxamps * 8);
+      int nrleds = floor(fconf.scale*(float) amps[i]/ (float) maxamps * 8);
       audioColor(i, cols, colors, col_color);
       for(int j = 0; j<nrleds; j++){
         drawxy(N/2+i, 7-j, col_color, conf.bright, false);
@@ -55,9 +65,8 @@ void render_fourier(){
     }
   }
   else{
-    
     for(int i=0; i<N/2; i++){
-      int nrleds = floor((float) amps[i]/ (float) maxamps * 8);
+      int nrleds = floor(fconf.scale*(float) amps[i]/ (float) maxamps * 8);
       audioColor(i, cols, colors, col_color);
       for(int j = 0; j<nrleds; j++){
         drawxy(i, 7-j, col_color, conf.bright, false);
@@ -71,13 +80,24 @@ void readMIC(){
   //Serial.println("reading mic...");
   unsigned long mu_s = micros();
   unsigned long dmu_s = 1000000/samplefreq;
+  float mean_p = 0;
   
   for(int i=0; i<N; i++){
     p_t[i] = analogRead(MIC);
+    mean_p += p_t[i];
     
     while((micros()-mu_s)<dmu_s){ }
     last_dmu = micros()-mu_s;
     mu_s = micros();
+  }
+
+  for(int i=0; i<N; i++){  
+    if(fconf.mirror){
+      p_t[i] = (int)(((float)p_t[i]-(mean_p/(float)N))*hann[2*i]);
+    }
+    else{
+      p_t[i] = (int)(((float)p_t[i]-(mean_p/(float)N))*hann[i]);
+    }
   }
 }
 String lastDmu(){
