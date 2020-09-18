@@ -141,12 +141,13 @@ bool removeJsonEntry(String fname, String key){
   return true;
 }
 
+//TODO by jan
 void writeAudioCols(){
   String data = "";
-  for(uint8_t k = 0; k < sizeof(conf.audioCols)/sizeof(CRGB); k++){
-    data += String(conf.audioCols[k].r) + "," + String(conf.audioCols[k].g) + "," + String(conf.audioCols[k].b) + ";";
+  for(uint8_t k = 0; k < sizeof(fconf.audioCols)/sizeof(CRGB); k++){
+    data += String(fconf.audioCols[k].r) + "," + String(fconf.audioCols[k].g) + "," + String(fconf.audioCols[k].b) + ";";
   }
-  writeConfig("audioCols", data);
+  //writeAnyConfig("audioCols", data);
 }
 
 void loadConfig(){
@@ -184,11 +185,11 @@ void loadAudioCols(String data){
   int k = 0;
   while(data.indexOf(";") > 0){
     String tempcol = data.substring(0, data.indexOf(";"));
-    conf.audioCols[k].r = tempcol.substring(0, tempcol.indexOf(",")).toInt();
+    fconf.audioCols[k].r = tempcol.substring(0, tempcol.indexOf(",")).toInt();
     tempcol = tempcol.substring(tempcol.indexOf(",") + 1);
-    conf.audioCols[k].g = tempcol.substring(0, tempcol.indexOf(",")).toInt();
+    fconf.audioCols[k].g = tempcol.substring(0, tempcol.indexOf(",")).toInt();
     tempcol = tempcol.substring(tempcol.indexOf(",") + 1);
-    conf.audioCols[k].b = tempcol.toInt();
+    fconf.audioCols[k].b = tempcol.toInt();
     data = data.substring(data.indexOf(";") + 1);
     k++;
   }

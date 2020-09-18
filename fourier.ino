@@ -33,7 +33,7 @@ void render_fourier(){
   
   for(int i=0; i<32; i++){
     int p = analogRead(MIC);
-    Serial.println(p);
+    //Serial.println(p);
     p_t[i] = p-415;
     delay(1);
   }
@@ -43,25 +43,24 @@ void render_fourier(){
   int maxamps = 2000;
   int cols;
   CRGB colors[6];
-  uint8_t* col_color;
+  uint8_t col_color[3];
   
   getAudioColors(&cols, colors);
-  Serial.println(cols);
-  //audioColor(0, nCols, colors, col_color);
-  
+  //Serial.println(cols);
+  audioColor(0, cols, colors, col_color);
   
   for(int i=0; i<N/2; i++){
     int nrleds = floor((float) amps[i]/ (float) maxamps * 8);
-    //audioColor(i, nCols, colors, col_color);
+    audioColor(i, cols, colors, col_color);
     for(int j = 0; j<nrleds; j++){
-      drawxy(N/2-i-1, 7-j, red, 0.9, false);
+      drawxy(N/2-i-1, 7-j, col_color, conf.bright, false);
     }
   }
   for(int i=0; i<N/2; i++){
     int nrleds = floor((float) amps[i]/ (float) maxamps * 8);
-    //audioColor(i, nCols, colors, col_color);
+    audioColor(i, cols, colors, col_color);
     for(int j = 0; j<nrleds; j++){
-      drawxy(N/2+i, 7-j, red, 0.9, false);
+      drawxy(N/2+i, 7-j, col_color, conf.bright, false);
     }
   }
   
@@ -70,15 +69,14 @@ void render_fourier(){
 // usage: before looping through amps generate nCols and colors:
 void getAudioColors(int* nCols, CRGB* colors){
   *nCols = 0;
-  int k_max = sizeof(conf.audioCols)/sizeof(CRGB);
-  Serial.println(k_max);
+  int k_max = sizeof(fconf.audioCols)/sizeof(CRGB);
+  
   for(int k = 0; k < k_max; k++){
-    if(conf.audioCols[k].r == 0 && conf.audioCols[k].g == 0 && conf.audioCols[k].b == 0) continue;
-    colors[*nCols].r = conf.audioCols[k].r;
-    colors[*nCols].g = conf.audioCols[k].g;
-    colors[*nCols].b = conf.audioCols[k].b;
+    if(fconf.audioCols[k].r == 0 && fconf.audioCols[k].g == 0 && fconf.audioCols[k].b == 0) continue;
+    colors[*nCols].r = fconf.audioCols[k].r;
+    colors[*nCols].g = fconf.audioCols[k].g;
+    colors[*nCols].b = fconf.audioCols[k].b;
     *nCols = *nCols + 1;
-    Serial.println(*nCols);
   }
 }
 // in loop through x vals use this to retrieve color at given x
@@ -96,7 +94,6 @@ void audioColor(int posx, int nCols, CRGB* colors, uint8_t* out_color){
     return;
   }
   int dist = (N/2)/(nCols-1);
-  Serial.println(dist);
   int nEnd = 1;
   while(nEnd*dist - 1 < posx) nEnd++;
   float f = (float)(posx%dist)/(float)dist;

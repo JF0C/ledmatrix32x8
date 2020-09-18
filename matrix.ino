@@ -1,5 +1,5 @@
 #define FASTLED_ESP8266_RAW_PIN_ORDER
-#define PIN1 14 //D5
+#define PIN1 D5 //14
 #define NUM_LEDS 256
 
 #include <ArduinoJson.h>
@@ -42,6 +42,15 @@ enum opmodes{
   maze
 };
 
+struct fourierconfig{
+  int samplefreq = 1000;//Hz
+  int minfreq = 0;
+  int maxfreq = samplefreq/2;
+  bool mirror = true;
+  CRGB audioCols[6];
+  
+}fconf;
+
 struct confstruct{
   float bright = 0.4;
   float velocity = 0.05;
@@ -59,8 +68,6 @@ struct confstruct{
   uint8_t bgg;
   uint8_t bgb;
 
-  CRGB audioCols[6];
-  
   uint8_t paintr;
   uint8_t paintg;
   uint8_t paintb;

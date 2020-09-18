@@ -328,7 +328,7 @@ void handlefourier(){
     else if(argname.startsWith("col")){
       argname.replace("col", "");
       int pos = argname.toInt();
-      if(pos < 0 || pos >= sizeof(conf.audioCols)/sizeof(CRGB)){
+      if(pos < 0 || pos >= sizeof(fconf.audioCols)/sizeof(CRGB)){
         msg += F("error: invalid color index");
         continue;
       }
@@ -338,9 +338,9 @@ void handlefourier(){
       g = value.substring(0, value.indexOf(",")).toInt();
       value = value.substring(value.indexOf(",") + 1);
       b = value.toInt();
-      conf.audioCols[pos].r = r;
-      conf.audioCols[pos].g = g;
-      conf.audioCols[pos].b = b;
+      fconf.audioCols[pos].r = r;
+      fconf.audioCols[pos].g = g;
+      fconf.audioCols[pos].b = b;
       writeAudioCols();
       msg += "{\"color" + String(pos) + "\": \"rgb(" + String(r) + "," + String(g) + "," + String(b) + ")\"}";
     }
