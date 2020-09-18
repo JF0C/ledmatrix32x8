@@ -29,43 +29,57 @@ float sampling_frequency = 1000; //Hz
 
 
 void render_fourier(){  
-  if(!conf.fouriermode) return;
-  
+  if(conf.opmode != fourier) return;
+  //Serial.println("Fouriermode");
+
   for(int i=0; i<32; i++){
     int p = analogRead(MIC);
     Serial.println(p);
     p_t[i] = p-415;
     delay(1);
   }
-
+  
   Full_FFT(p_t, N, sampling_frequency);
   
-  int maxamps = 2000;//getMax(amps, N);
-  //Serial.println(maxamps);
-
+  int maxamps = 2000;
+  int cols;
+  CRGB colors[6];
+  uint8_t* col_color;
+  
+  getAudioColors(&cols, colors);
+  Serial.println(cols);
+  //audioColor(0, nCols, colors, col_color);
+  
+  
   for(int i=0; i<N/2; i++){
     int nrleds = floor((float) amps[i]/ (float) maxamps * 8);
+    //audioColor(i, nCols, colors, col_color);
     for(int j = 0; j<nrleds; j++){
       drawxy(N/2-i-1, 7-j, red, 0.9, false);
     }
   }
   for(int i=0; i<N/2; i++){
     int nrleds = floor((float) amps[i]/ (float) maxamps * 8);
+    //audioColor(i, nCols, colors, col_color);
     for(int j = 0; j<nrleds; j++){
       drawxy(N/2+i, 7-j, red, 0.9, false);
     }
   }
+  
 }
 
 // usage: before looping through amps generate nCols and colors:
 void getAudioColors(int* nCols, CRGB* colors){
   *nCols = 0;
-  for(int k = 0; k < sizeof(conf.audioCols)/sizeof(CRGB); k++){
+  int k_max = sizeof(conf.audioCols)/sizeof(CRGB);
+  Serial.println(k_max);
+  for(int k = 0; k < k_max; k++){
     if(conf.audioCols[k].r == 0 && conf.audioCols[k].g == 0 && conf.audioCols[k].b == 0) continue;
     colors[*nCols].r = conf.audioCols[k].r;
     colors[*nCols].g = conf.audioCols[k].g;
     colors[*nCols].b = conf.audioCols[k].b;
     *nCols = *nCols + 1;
+    Serial.println(*nCols);
   }
 }
 // in loop through x vals use this to retrieve color at given x
@@ -82,7 +96,8 @@ void audioColor(int posx, int nCols, CRGB* colors, uint8_t* out_color){
     out_color[2] = colors[0].b;
     return;
   }
-  int dist = N/(nCols-1);
+  int dist = (N/2)/(nCols-1);
+  Serial.println(dist);
   int nEnd = 1;
   while(nEnd*dist - 1 < posx) nEnd++;
   float f = (float)(posx%dist)/(float)dist;

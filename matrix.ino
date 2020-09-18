@@ -356,14 +356,6 @@ bool wStr2CharArr(String str, char* chr, int len){
   }
 }
 
-int printStringSimple(String str, uint8_t* col, float f, int offset = 0){
-  int p = offset;
-  for(int k = 0; k < str.length(); k++){
-    p += letter(p, 0, col, f, String(str[k]))+1;
-  }
-  return p;
-}
-
 int getMax(int* array, int size)
 {
   int maximum = array[0];

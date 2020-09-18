@@ -1,10 +1,12 @@
 void InitWeb(){
   Serial.println(F("\nstarting wifi"));
   WiFi.softAP("matrix", "tsvrxvu2");
-//  WiFi.softAPConfig(local_ip, gateway, subnet);
   Serial.println(F("creating acces point"));
 
   
+  Serial.println("Attempting to connect: ");
+  Serial.println(conf.ssid);
+  Serial.println(conf.pw);
   WiFi.begin(conf.ssid, conf.pw);
   //delay(100);
   if(WiFi.status() != WL_CONNECTED)
@@ -37,7 +39,8 @@ void InitWeb(){
       server.send(404, "text/plain", "404: Not Found"); // otherwise, respond with a 404 (Not Found) error
   });
   server.begin();
-  Serial.println(F("wifi started"));
+  Serial.println("[ERROR] failed to connect");
+  else Serial.println("wifi started");
 }
 
 void handleset(){
@@ -353,12 +356,7 @@ void handlefourier(){
       }
     }
   }
-<<<<<<< HEAD
   server.send(200, "text/plain", msg); 
-=======
-  server.send(200, "text/plain", "Sucksess"); 
-  //call_FFT();
->>>>>>> Cedric
 }
 
 void handleframerate(){

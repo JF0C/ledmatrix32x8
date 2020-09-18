@@ -175,12 +175,7 @@ void loadConfig(){
     Serial.println(F("ERROR: wifi name too long"));
   
   if(!wStr2CharArr(json["pw"].as<String>(), &conf.pw[0], 50))
-    Serial.println(F("ERROR: wifi password too long"));
-    
-  // TODO maze
-  // two mazes generated automatically
-  // two players work throgh it first one to get to the middle wins
- 
+    Serial.println(F("ERROR: wifi password too long"));    
 
   file.close();
 }
