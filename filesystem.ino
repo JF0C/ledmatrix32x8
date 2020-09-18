@@ -141,24 +141,27 @@ bool removeJsonEntry(String fname, String key){
   return true;
 }
 
-//TODO by jan
-void writeAudioCols(){
-  String data = "";
-  for(uint8_t k = 0; k < sizeof(fconf.audioCols)/sizeof(CRGB); k++){
-    data += String(fconf.audioCols[k].r) + "," + String(fconf.audioCols[k].g) + "," + String(fconf.audioCols[k].b) + ";";
+void writeAudioConfig(String key, String data){
+  if(key == "colors"){
+    data = "";
+    for(uint8_t k = 0; k < sizeof(fconf.audioCols)/sizeof(CRGB); k++){
+      data += String(fconf.audioCols[k].r) + "," + String(fconf.audioCols[k].g) + "," + String(fconf.audioCols[k].b) + ";";
+    }
   }
-  //writeAnyConfig("audioCols", data);
+  writeAnyConfig(key, data, F("/fourierconfig.json"), 0);
 }
 
 void loadConfig(){
   File file = SPIFFS.open(F("/config.json"), "r");
   if(!file){
     Serial.println(F("Error: could not open config file"));
+    file.close();
     return;
   }
   DeserializationError err = deserializeJson(json, file);
   if(err){
     Serial.println(F("Error: could not deserialize config"));
+    file.close();
     return;
   }
   conf.text = json["text"].as<String>();
@@ -170,7 +173,6 @@ void loadConfig(){
   conf.bgb = json["bgb"].as<uint8_t>();
   conf.bgbright = json["bgbright"].as<float>();
   conf.paintr = json["paintr"].as<uint8_t>();
-  loadAudioCols(json["audioCols"].as<String>());
 
   if(!wStr2CharArr(json["ssid"].as<String>(), &conf.ssid[0], 50))
     Serial.println(F("ERROR: wifi name too long"));
@@ -178,6 +180,27 @@ void loadConfig(){
   if(!wStr2CharArr(json["pw"].as<String>(), &conf.pw[0], 50))
     Serial.println(F("ERROR: wifi password too long"));    
 
+  file.close();
+}
+
+void loadFourierConf(){
+  File file = SPIFFS.open("/fourierconfig.json", "r");
+  if(!file){
+    Serial.println(F("Error: could not open config file"));
+    file.close();
+    return;
+  }
+  DeserializationError err = deserializeJson(json, file);
+  if(err){
+    Serial.println(F("Error: could not deserialize config"));
+    file.close();
+    return;
+  }
+  loadAudioCols(json["colors"].as<String>());
+  fconf.minfreq = json["minfreq"].as<int>();
+  fconf.maxfreq = json["maxfreq"].as<int>();
+  fconf.mirror = json["mirror"].as<bool>();
+  
   file.close();
 }
 
@@ -202,16 +225,19 @@ void loadPongConf(){
   File file = SPIFFS.open("/pconfig.json", "r");
   if(!file){
     Serial.println(F("Error: could not open config file"));
+    file.close();
     return;
   }
   DeserializationError err = deserializeJson(json, file);
   if(err){
     Serial.println(F("Error: could not deserialize config"));
+    file.close();
     return;
   }
   pconf.limit = json["limit"].as<int>();
   pconf.name_p1 = json["name_p1"].as<String>();
   pconf.name_p2 = json["name_p2"].as<String>();
+  file.close();
 }
 
 bool tryOtherWifis(){

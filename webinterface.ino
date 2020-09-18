@@ -40,6 +40,7 @@ void InitWeb(){
   });
   server.begin();
   Serial.println("wifi started");
+  Serial.println(WiFi.localIP());
 }
 
 void handleset(){
@@ -341,7 +342,7 @@ void handlefourier(){
       fconf.audioCols[pos].r = r;
       fconf.audioCols[pos].g = g;
       fconf.audioCols[pos].b = b;
-      writeAudioCols();
+      writeAudioConfig("colors", "");
       msg += "{\"color" + String(pos) + "\": \"rgb(" + String(r) + "," + String(g) + "," + String(b) + ")\"}";
     }
     else if(argname == "test"){
@@ -354,8 +355,38 @@ void handlefourier(){
         msg += String(k) + "(" + col[0] + "," + col[1] + "," + col[2] + "), ";
       }
     }
+    else if(argname == "mirror"){
+      msg = "mirror: " + value;
+      if(value == "true") {
+        fconf.mirror = true;
+        writeAudioConfig(argname, value);
+      }
+      else if(value == "false"){
+        fconf.mirror = false;
+        writeAudioConfig(argname, value);
+      }
+      else msg = "error: invalid argument for mirror";
+      
+    }
+    else if(argname == "minfreq"){
+      fconf.minfreq = boundedInt(value, 0, 500);
+      writeAudioConfig(argname, String(fconf.minfreq));
+      msg = argname + ": " + fconf.minfreq;
+    }
+    else if(argname == "maxfreq"){
+      fconf.maxfreq = boundedInt(value, 500, 20000);
+      writeAudioConfig(argname, String(fconf.maxfreq));
+      msg = argname + ": " + fconf.maxfreq;
+    }
   }
-  server.send(200, "text/plain", msg); 
+  server.send(200, "text/plain", msg);
+}
+
+int boundedInt(String value, int minval, int maxval){
+  int res = value.toInt();
+  res = min(res, maxval);
+  res = max(res, minval);
+  return res;
 }
 
 void handleframerate(){

@@ -43,9 +43,8 @@ enum opmodes{
 };
 
 struct fourierconfig{
-  int samplefreq = 1000;//Hz
   int minfreq = 0;
-  int maxfreq = samplefreq/2;
+  int maxfreq = 2000;
   bool mirror = true;
   CRGB audioCols[6];
   
@@ -74,6 +73,7 @@ struct confstruct{
   uint8_t painthard;
   uint8_t paintsize;
   bool painterase;
+  unsigned long servertimer;
 }conf;
 
 struct pongconfiguration{
@@ -96,12 +96,13 @@ void setup() {
   InitWeb();
   loadPongConf();
   loadBackground();
+  loadFourierConf();
+  conf.servertimer = millis();
 }
 
 void loop() {
   dt = millis() - t;
   t = millis();
-  sineval = (sin(1.5708*(float)t/300.0)+1.0)/2.0;
   clear_matrix();
   render_fourier();
   displayText();
@@ -109,10 +110,23 @@ void loop() {
   render_worms();
   render_maze();
   copypaint();
-  server.handleClient();
   FastLED.show();
+  bufferDelay();
+}
 
-  delay(5);
+void bufferDelay(){
+  if(conf.opmode != fourier){
+    delay(5);
+    sineval = (sin(1.5708*(float)t/300.0)+1.0)/2.0;
+    server.handleClient();
+  }
+  else{
+    if(t - conf.servertimer > 300){
+      delay(5);
+      server.handleClient();
+      conf.servertimer = t;
+    }
+  }
 }
 
 // TODO add text buffer [200][8][8] = [200px in x][8px in height][8bits grayscale]

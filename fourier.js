@@ -43,6 +43,15 @@ $(document).ready(()=>{
 			$('#color' + k).css('background', '#' + getColorRgb(rgb[0], rgb[1], rgb[2]));
 		}
 	}).fail(e=>console.log(e));
+	$('#mirror-switch').click(()=>{
+		$('#mirror-switch-thumb').toggleClass('active');
+		if($('#mirror-switch-thumb').hasClass('active'))
+			sendFourier({'mirror': 'true'});
+		else
+			sendFourier({'mirror': 'false'});
+	});
+	$('#min-freq').change(e=>sendFourier({'minfreq': $(e.target).val()}));
+	$('#max-freq').change(e=>sendFourier({'maxfreq': $(e.target).val()}));
 });
 
 function sendFourier(obj, after){

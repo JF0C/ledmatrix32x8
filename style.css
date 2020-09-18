@@ -315,3 +315,18 @@ body{
     vertical-align: middle;
     margin: 5px;
 }
+#mirror-switch{
+	width: 100px;
+	height: 50px;
+	border: 1px solid black;
+}
+#mirror-switch-thumb{
+	width: 50px;
+	height: 50px;
+	position: relative;
+	left: 0px;
+	background: black;
+}
+#mirror-switch-thumb.active{
+	left: 50px;
+}
