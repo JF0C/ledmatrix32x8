@@ -58,11 +58,16 @@
 			<div class="clearColor fbutton" data="5">clear</div>
 		</div>
 	</div>
-	<!--div onclick="sendFourier({'test': 1}, e=>console.log(e));">Test Colors</div-->
+	<div onclick="sendFourier({'test': 1}, e=>console.log(e));">Test</div>
 	<div id="control-container">
-		<div><input type="range" id="min-freq" min="0" max="500"></div>
-		<div><input type="range" id="max-freq" min="500" max="20000"></div>
-		<div id="mirror-switch"><div id="mirror-switch-thumb"></div></div>
+		<div>
+			<div class="slider-label">min freq:</div>
+			<input type="range" id="min-freq" min="0" max="500">
+		</div>
+		<div>
+			<div class="slider-label">max freq:</div>
+			<input type="range" id="max-freq" min="500" max="6000"></div>
+		<div id="mirror-switch"><div id="mirror-switch-thumb" style="color:white;">mirror</div></div>
 	</div>
 </body>
 </html>

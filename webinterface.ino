@@ -350,10 +350,13 @@ void handlefourier(){
       CRGB colors[6];
       uint8_t col[3];
       getAudioColors(&nCols, colors);
+      /*
       for(uint8_t k = 0; k < 32; k++){
         audioColor(k, nCols, colors, col);
         msg += String(k) + "(" + col[0] + "," + col[1] + "," + col[2] + "), ";
       }
+      */
+      msg = lastDmu();
     }
     else if(argname == "mirror"){
       msg = "mirror: " + value;
@@ -374,7 +377,7 @@ void handlefourier(){
       msg = argname + ": " + fconf.minfreq;
     }
     else if(argname == "maxfreq"){
-      fconf.maxfreq = boundedInt(value, 500, 20000);
+      fconf.maxfreq = boundedInt(value, 500, 6000);
       writeAudioConfig(argname, String(fconf.maxfreq));
       msg = argname + ": " + fconf.maxfreq;
     }

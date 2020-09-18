@@ -47,7 +47,7 @@ struct fourierconfig{
   int maxfreq = 2000;
   bool mirror = true;
   CRGB audioCols[6];
-  
+  float scale;
 }fconf;
 
 struct confstruct{

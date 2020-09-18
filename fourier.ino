@@ -9,7 +9,7 @@ byte sine_data [91]=  { 0,    4,    9,    13,   18,   22,   27,   31,   35,   40
                         251,  252,  253,  253,  254,  254,  254,  255,  255,  255,  255};
                         
 int amps[32] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0};
+                0, 0, 0, 0, 0, 0, 0, 0};
                 
 int p_t[64] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
               0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -21,11 +21,14 @@ int samplefreq = 2*fconf.maxfreq;
 
 void render_fourier(){  
   if(conf.opmode != fourier) return;
-  if(mirror) N=32;
+  if(fconf.mirror) N=32;
+  else N=64;
+
+  samplefreq = 2*fconf.maxfreq;
   
   readMIC();
   Full_FFT(p_t, N, samplefreq);
-  calc_bins();
+  //calc_bins();
   
   int maxamps = 2000;
   int cols;
@@ -34,15 +37,15 @@ void render_fourier(){
   
   getAudioColors(&cols, colors);
 
-  for(int i=0; i<N/2; i++){
-    int nrleds = floor((float) amps[i]/ (float) maxamps * 8);
-    audioColor(i, cols, colors, col_color);
-    for(int j = 0; j<nrleds; j++){
-      drawxy(N/2-i-1, 7-j, col_color, conf.bright, false);
-    }
-  }
   
-  if(mirror){
+  if(fconf.mirror){
+    for(int i=0; i<N/2; i++){
+      int nrleds = floor((float) amps[i]/ (float) maxamps * 8);
+      audioColor(i, cols, colors, col_color);
+      for(int j = 0; j<nrleds; j++){
+        drawxy(N/2-i-1, 7-j, col_color, conf.bright, false);
+      }
+    }
     for(int i=0; i<N/2; i++){
       int nrleds = floor((float) amps[i]/ (float) maxamps * 8);
       audioColor(i, cols, colors, col_color);
@@ -51,24 +54,39 @@ void render_fourier(){
       }
     }
   }
-}
-
-void readMIC(){
-  int mu_s = micros();
-  int dmu_s = 1000000/samplefreq;
-  
-  for(int i=0; i<N; i++){
-    int p = analogRead(MIC);
-    p_t[i] = p-415;
-    while((micros()-mu_s)<dmu_s){
-      mu_s = micros();
+  else{
+    
+    for(int i=0; i<N/2; i++){
+      int nrleds = floor((float) amps[i]/ (float) maxamps * 8);
+      audioColor(i, cols, colors, col_color);
+      for(int j = 0; j<nrleds; j++){
+        drawxy(i, 7-j, col_color, conf.bright, false);
+      }
     }
   }
 }
 
+unsigned long last_dmu;
+void readMIC(){
+  //Serial.println("reading mic...");
+  unsigned long mu_s = micros();
+  unsigned long dmu_s = 1000000/samplefreq;
+  
+  for(int i=0; i<N; i++){
+    p_t[i] = analogRead(MIC);
+    
+    while((micros()-mu_s)<dmu_s){ }
+    last_dmu = micros()-mu_s;
+    mu_s = micros();
+  }
+}
+String lastDmu(){
+  return String(last_dmu);
+}
+
 void calc_bins(){
   int amps_old[32] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0};;
+                0, 0, 0, 0, 0, 0, 0, 0};
 }
 
 // usage: before looping through amps generate nCols and colors:
