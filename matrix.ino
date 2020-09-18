@@ -73,6 +73,7 @@ struct confstruct{
   uint8_t painthard;
   uint8_t paintsize;
   bool painterase;
+  unsigned long servertimer;
 }conf;
 
 struct pongconfiguration{
