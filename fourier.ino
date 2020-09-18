@@ -1,44 +1,31 @@
-int testfunction(float Time){
-  float Pi = 3.14159265359;
-  return (int) 50*(cos(2*Pi*100*Time)+(1+0.5*cos(2*Pi*100*Time))*sin(2*Pi*300*Time)+1);
-}
+byte sine_data [91]=  { 0,    4,    9,    13,   18,   22,   27,   31,   35,   40,   
+                        44,   49,   53,   57,   62,   66,   70,   75,   79,   83,   
+                        87,   91,   96,   100,  104,  108,  112,  116,  120,  124,  
+                        127,  131,  135,  139,  143,  146,  150,  153,  157,  160,  
+                        164,  167,  171,  174,  177,  180,  183,  186,  189,  192,  
+                        195,  198,  201,  204,  206,  209,  211,  214,  216,  219,  
+                        221,  223,  225,  227,  229,  231,  233,  235,  236,  238,  
+                        240,  241,  243,  244,  245,  246,  247,  248,  249,  250,  
+                        251,  252,  253,  253,  254,  254,  254,  255,  255,  255,  255};
+                        
+int amps[32] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0};
+                
+int p_t[64] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-byte sine_data [91]=  {0,  
-                        4,    9,    13,   18,   22,   27,   31,   35,   40,   44, 
-                        49,   53,   57,   62,   66,   70,   75,   79,   83,   87, 
-                        91,   96,   100,  104,  108,  112,  116,  120,  124,  127,  
-                        131,  135,  139,  143,  146,  150,  153,  157,  160,  164,  
-                        167,  171,  174,  177,  180,  183,  186,  189,  192,  195,
-                        198,  201,  204,  206,  209,  211,  214,  216,  219,  221,  
-                        223,  225,  227,  229,  231,  233,  235,  236,  238,  240,  
-                        241,  243,  244,  245,  246,  247,  248,  249,  250,  251,  
-                        252,  253,  253,  254,  254,  254,  255,  255,  255,  255};
+int N = 64;
 
-int amps[64] = {2, 2, 2, 2, 2, 2, 2, 2,
-                4, 2, 2, 8, 2, 2, 2, 2,
-                2, 2, 2, 2, 2, 2, 2, 2,
-                2, 2, 2, 2, 2, 3, 2, 2};
-
-int N = 32;
-int p_t[32] = {0, 0, 0, 0, 0, 0, 0, 0,
-              0, 0, 0, 0, 0, 0, 0, 0,
-              0, 0, 0, 0, 0, 0, 0, 0,
-              0, 0, 0, 0, 0, 0, 0, 0};
-              
-float sampling_frequency = 1000; //Hz
-
+int samplefreq = 2*fconf.maxfreq;
 
 void render_fourier(){  
   if(conf.opmode != fourier) return;
+  if(mirror) N=32;
   
-  for(int i=0; i<32; i++){
-    int p = analogRead(MIC);
-    //Serial.println(p);
-    p_t[i] = p-415;
-    delay(1);
-  }
-  
-  Full_FFT(p_t, N, sampling_frequency);
+  readMIC();
+  Full_FFT(p_t, N, samplefreq);
+  calc_bins();
   
   int maxamps = 2000;
   int cols;
@@ -46,9 +33,7 @@ void render_fourier(){
   uint8_t col_color[3];
   
   getAudioColors(&cols, colors);
-  //Serial.println(cols);
-  audioColor(0, cols, colors, col_color);
-  
+
   for(int i=0; i<N/2; i++){
     int nrleds = floor((float) amps[i]/ (float) maxamps * 8);
     audioColor(i, cols, colors, col_color);
@@ -56,14 +41,34 @@ void render_fourier(){
       drawxy(N/2-i-1, 7-j, col_color, conf.bright, false);
     }
   }
-  for(int i=0; i<N/2; i++){
-    int nrleds = floor((float) amps[i]/ (float) maxamps * 8);
-    audioColor(i, cols, colors, col_color);
-    for(int j = 0; j<nrleds; j++){
-      drawxy(N/2+i, 7-j, col_color, conf.bright, false);
+  
+  if(mirror){
+    for(int i=0; i<N/2; i++){
+      int nrleds = floor((float) amps[i]/ (float) maxamps * 8);
+      audioColor(i, cols, colors, col_color);
+      for(int j = 0; j<nrleds; j++){
+        drawxy(N/2+i, 7-j, col_color, conf.bright, false);
+      }
     }
   }
+}
+
+void readMIC(){
+  int mu_s = micros();
+  int dmu_s = 1000000/samplefreq;
   
+  for(int i=0; i<N; i++){
+    int p = analogRead(MIC);
+    p_t[i] = p-415;
+    while((micros()-mu_s)<dmu_s){
+      mu_s = micros();
+    }
+  }
+}
+
+void calc_bins(){
+  int amps_old[32] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0};;
 }
 
 // usage: before looping through amps generate nCols and colors:
@@ -100,28 +105,6 @@ void audioColor(int posx, int nCols, CRGB* colors, uint8_t* out_color){
   out_color[0] =  (1.0-f) * colors[nEnd-1].r + f * colors[nEnd].r;
   out_color[1] =  (1.0-f) * colors[nEnd-1].g + f * colors[nEnd].g;
   out_color[2] =  (1.0-f) * colors[nEnd-1].b + f * colors[nEnd].b;
-}
-
-void call_FFT(){
-  float fs = 1000; //Hz
-  
-  float tmax = 0.1;
-  float dt_test = 1/fs;
-  int samples = 100;//(int) (tmax * fs) +1;
-
-  
-  int testsignal[samples];
-  Serial.print("Nr of testarray samples: ");
-  Serial.println(samples);
-  Serial.print("Sampling frequency: ");
-  Serial.println(1/dt_test);
-
-  
-  for(int i = 0; i < samples; i++){
-    testsignal[i] = testfunction((float)i * dt_test);
-  }
-
-  Full_FFT(testsignal, N, fs);
 }
 
 float Q_FFT(int in[],int N,float Frequency)
