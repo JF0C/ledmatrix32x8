@@ -96,6 +96,7 @@ void setup() {
   InitWeb();
   loadPongConf();
   loadBackground();
+  loadFourierConf();
 }
 
 void loop() {

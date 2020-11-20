@@ -338,9 +338,9 @@ body{
 	left: 50px;
 }
 .slider-label{
-	width: 200px;
+	width: 10%;
 	display: inline-block;
 }
 .fourier-slider{
-	width: 500px;
+	width: 80%;
 }
