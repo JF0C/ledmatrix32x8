@@ -44,9 +44,11 @@ function showFiles(e){
 		'type': 'json'
 	}).done(f=>{
 		for(let n of f){
-			if(!n.startsWith('/paints/')) continue;
-			let dispn = n.replace('/paints/', '').replace('.paint', '');
-			$('#file-list').append('<div class="open-file" data="' + n + '">' + dispn + '</div>');
+			let filename = Object.keys(n)[0];
+			if(filename == undefined) continue;
+			if(!filename.startsWith('/paints/')) continue;
+			let dispn = filename.replace('/paints/', '').replace('.paint', '');
+			$('#file-list').append('<div class="open-file" data="' + filename + '">' + dispn + '</div>');
 		}
 		$('.open-file').click(e=>{
 			$('#file-list').html('');
