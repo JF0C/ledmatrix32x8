@@ -9,6 +9,7 @@ FastLED version 3.4.0
 in webinterface.ino line 9 uncomment and change ssid and password to match your wifi acces point  
 after flashing and starting the esp read the ip displayed on the serial monitor / led matrix  
 go to <ip>/upload and upload all files of this repository ending with .js, .html, .json and .css  
+this document helps a lot at understanding and programming the esp8266 https://tttapa.github.io/ESP8266/Chap01%20-%20ESP8266.html    
 
 ## Setup Hardware
 led matrix 5V 32x8 was used something like: https://www.amazon.de/BTF-LIGHTING-RGB-Legierung-adressierbar-FCB-Vollfarbe-funktioniert/dp/B088K1KDW5/ref=sr_1_5?__mk_de_DE=%C3%85M%C3%85%C5%BD%C3%95%C3%91&dchild=1&keywords=led+matrix&qid=1628182227&sr=8-5  
