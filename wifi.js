@@ -14,16 +14,6 @@ $(document).ready(()=>{
 		}).fail(e=>console.log(e));
 		highlight(e.target);
 	});
-	$('#setwifi').click(e=>{
-		if($(e.target).hasClass('clicked')) return;
-		let t = $('.wifi-entry.selected .wifi-name');
-		if(t.length == 0) {
-			alert('select wifi first');
-			return;
-		}
-		highlight($(e.target));
-		setWifi(t.html(), t.attr('data'));
-	});
 	loadWifis();
 });
 

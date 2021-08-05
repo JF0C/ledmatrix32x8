@@ -1,16 +1,29 @@
 void InitWeb(){
   Serial.println(F("\nstarting wifi"));
-  WiFi.softAP("matrix", "tsvrxvu2");
-  Serial.println(F("creating acces point"));
+  //WiFi.softAP("matrix", "tsvrxvu2");
+  //Serial.println(F("creating acces point"));
 
   
+  //WiFi.begin(conf.ssid, conf.pw);
+  //WiFi.begin("R.I.C.H.", "r1chl1k35b33r4nd$");
+  //wifi.addAP("R.I.C.H.", "r1chl1k35b33r4nd$");
+  loadWifis();
   Serial.println("Attempting to connect: ");
-  Serial.println(conf.ssid);
-  Serial.println(conf.pw);
-  WiFi.begin(conf.ssid, conf.pw);
-  //delay(100);
-  if(WiFi.status() != WL_CONNECTED)
-    tryOtherWifis();
+  delay(100);
+  ESP.wdtDisable();
+  /*
+  while(WiFi.status() != WL_CONNECTED){
+    delay(500);
+    Serial.print(".");
+  }*/
+  
+  while (wifi.run() != WL_CONNECTED){ 
+    delay(250);
+    Serial.print('.');
+  }
+  ESP.wdtEnable(2000);
+  //if(WiFi.status() != WL_CONNECTED)
+  //  tryOtherWifis();
   
   if (!MDNS.begin("matrix")) {             // Start the mDNS responder for node.local
     Serial.println(F("Error setting up MDNS responder!"));
@@ -40,7 +53,8 @@ void InitWeb(){
   });
   server.begin();
   Serial.println("wifi started");
-  Serial.println(WiFi.localIP());
+  LocalIp = WiFi.localIP().toString();
+  Serial.println(LocalIp);
 }
 
 void handleset(){
@@ -52,6 +66,7 @@ void handleset(){
       conf.opmode = text;
       writeConfig("text", value);
       conf.text = value;
+      newtext = true;
       message = "text set to: " + value;
     }
     else if(argname == F("velocity")){
@@ -114,36 +129,6 @@ void handleset(){
         writeConfig("bgbright", String(conf.bgbright));
         message = "background brightness: " + String(conf.bgbright);
       }
-    }
-    else if(argname == "ssid"){
-      int l = value.length();
-      if(l >= 50){
-        server.send(0, "text/plain", "ssid too long");
-        break;
-      }
-      for(uint8_t k = 0; k < 50; k++){
-        if(k < l)
-          conf.ssid[k] = value[k];
-        else
-          conf.ssid[k] = 0;
-      }
-      writeConfig("ssid", conf.ssid);
-      message = "set ssid to " + value;
-    }
-    else if(argname == "pw"){
-      int l = value.length();
-      if(l >= 50){
-        server.send(0, "text/plain", "password too long");
-        break;
-      }
-      for(uint8_t k = 0; k < 50; k++){
-        if(k < l)
-          conf.pw[k] = value[k];
-        else
-          conf.pw[k] = 0;
-      }
-      writeConfig("pw", conf.pw);
-      message = "set wifi pw";
     }
   }
   server.send(200, "text/plain", message);
@@ -286,7 +271,14 @@ void listfiles(){
   Dir root = SPIFFS.openDir("/");
   String msg = "[\n";
   while(root.next()){
-    msg += "  \"" + root.fileName() + "\",\n";
+    String fname = root.fileName();
+    File f = SPIFFS.open(fname, "r");
+    int fsize = 0;
+    if(f){
+      fsize = f.size();
+      f.close();
+    }
+    msg += "  {\"" + fname + "\": " + fsize + "},\n";
   }
   msg += "  \"\"\n]";
   server.send(200, "text/json", msg);

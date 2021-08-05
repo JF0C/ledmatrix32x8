@@ -1,10 +1,11 @@
 #define FASTLED_ESP8266_RAW_PIN_ORDER
-#define PIN1 D5 //14
+#define PIN1 14 //14 D5
 #define NUM_LEDS 256
 
 #include <ArduinoJson.h>
 #include <FastLED.h>
 #include <ESP8266WiFi.h>
+#include <ESP8266WiFiMulti.h>
 #include <ESP8266mDNS.h>
 #include <ESP8266WebServer.h>
 #include <FS.h>
@@ -13,6 +14,7 @@ CRGB s1[NUM_LEDS];
 CRGB paintdata[NUM_LEDS];
 
 ESP8266WebServer server(80);
+ESP8266WiFiMulti wifi;
 File fsUploadFile;
 int MIC = A0;
 
@@ -32,6 +34,8 @@ uint8_t rich[3] = {255, 109, 12};
 uint8_t wormscol[3] = {255, 196, 77};
 uint8_t blank[3] = {0,0,0};
 float sineval = 0.0;
+bool newtext;
+String LocalIp;
 
 enum opmodes{
   text,
@@ -55,11 +59,8 @@ struct confstruct{
   float velocity = 0.05;
   float pulsing = 0;
   String text;
-  char ssid[50] = "R.I.C.H.";
-  char pw[50] = "r1chl1k35b33r4nd$";
-  //char ssid[50] = "FRITZ!Box 7560 MS";
-  //char pw[50] = "74507453497218775126";
   opmodes opmode;
+  bool initializing = true;
   
   String background = "";
   float bgbright = 0.2;
@@ -104,12 +105,14 @@ void loop() {
   t = millis();
   sineval = (sin(1.5708*(float)t/300.0)+1.0)/2.0;
   clear_matrix();
-  render_fourier();
   displayText();
-  render_pong();
-  render_worms();
-  render_maze();
-  copypaint();
+  if(!conf.initializing){
+    render_fourier();
+    render_pong();
+    render_worms();
+    render_maze();
+    copypaint();
+  }
   server.handleClient();
   FastLED.show();
 
@@ -118,15 +121,24 @@ void loop() {
 
 // TODO add text buffer [200][8][8] = [200px in x][8px in height][8bits grayscale]
 void displayText(){
-  if(conf.opmode != text) return;
-  int printlength = printString(conf.text, 0, 32);
+  if(conf.opmode != text && !conf.initializing) return;
+  String text = conf.text;
+  if(conf.initializing){
+    text = LocalIp;
+  }
+  int printlength = printString(text, 0, 32);
   conf.pulsing = sin((float)t/1000*3.1416*0.5);
   conf.pulsing *= conf.pulsing;
   if(printlength > 32){
-    pos += conf.velocity*(float)dt/1000.0;
+    if(conf.initializing){
+      pos -= 0.06;
+    }
+    else{
+      pos += conf.velocity*(float)dt/1000.0;
+    }
     if(conf.velocity > 0){
       if(pos >= 0.0){
-        printString(conf.text, -printlength - 3, 32);
+        printString(text, -printlength - 3, 32);
       }
       if(pos - printlength >= 0){
         pos = -3.0;
@@ -134,7 +146,7 @@ void displayText(){
     }
     else{
       if(printlength + pos < 32){
-        printString(conf.text, printlength + 3, 32);
+        printString(text, printlength + 3, 32);
       }
       if(pos + printlength <= 0){
         pos = 3.0;
@@ -157,7 +169,7 @@ int printString(String text, int offset, int len){
   bool pulse = false;
   uint8_t rotate = 0;
   for(int k = 0; k < l; k++){
-    if(ismarkup(l-k, &k, "<smile>", text.substring(k))) 
+    if(ismarkup(l-k, &k, "<smile>", text.substring(k)))
       offset += smiley(offset + pos, 0, color, getBright(pulse), "smile", &rotate)+1;
     else if(ismarkup(l-k, &k, "<frown>", text.substring(k)))
       offset += smiley(offset + pos, 0, color, getBright(pulse), "frown", &rotate)+1;
@@ -260,6 +272,7 @@ int printString(String text, int offset, int len){
 }
 
 float getBright(bool pulsing){
+  if(conf.initializing) return 0.9;
   if(pulsing) return conf.bright*conf.pulsing;
   else return conf.bright;
 }
@@ -270,6 +283,7 @@ bool ismarkup(int l, int* k, String pattern, String text){
     *k += (pattern.length() - 1);
     return true;
   }
+  return false;
 }
 
 void drawxy(int x, int y, uint8_t* color, float f, bool overridedraw){
@@ -363,10 +377,12 @@ int printStringSimple(String str, uint8_t* col, float f, int offset = 0){
 bool wStr2CharArr(String str, char* chr, int len){
   int l = str.length();
   if(l >= len) return false;
-  for(int k = 0; k < 50; k++){
+  for(int k = 0; k < len; k++){
+    if(k >= len) break;
     if(k < l) chr[k] = str[k];
     else chr[k] = 0;
   }
+  return true;
 }
 
 int getMax(int* array, int size)
