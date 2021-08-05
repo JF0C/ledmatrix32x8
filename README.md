@@ -6,7 +6,7 @@ set up arduino IDE: https://randomnerdtutorials.com/how-to-install-esp8266-board
 esp8266 board library version 3.0.1 was used  
 ArduinoJson version 6.18.3  
 FastLED version 3.4.0  
-in webinterface.ino line 9 change ssid and password to match your wifi acces point  
+in webinterface.ino line 9 uncomment and change ssid and password to match your wifi acces point  
 after flashing and starting the esp read the ip displayed on the serial monitor / led matrix  
 go to <ip>/upload and upload all files of this repository ending with .js, .html, .json and .css  
 
