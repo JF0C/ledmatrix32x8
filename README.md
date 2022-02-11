@@ -1,6 +1,10 @@
 # ledmatrix32x8
 controlling an led matrix with esp8266 using web interfaces and wifi acces point
 
+## Preview of the Fourier Transform Functionality
+This is a snippet of the fourier transform of [Thunder by Netsky](https://open.spotify.com/track/0AQAdESuhbfV2ldTpO2MYF?si=XHX3PpR1S5uot5eVFank0A&context=spotify%3Asearch%3Athunder%2520).
+<img src="https://github.com/JF0C/ledmatrix32x8/blob/master/fourier%20transform%20.gif"/>
+
 ## Setup Software
 set up arduino IDE: https://randomnerdtutorials.com/how-to-install-esp8266-board-arduino-ide/  
 esp8266 board library version 3.0.1 was used  
