@@ -1,0 +1,346 @@
+body{
+	font-size: 20;
+}
+.fsbutton{
+	border: 1px solid black;
+    display: inline-block;
+    height: 100%;
+    width: 45%;
+}
+.fscontainer{
+	height: 70%;
+	text-align: center;
+	vertical-align: middle;
+	margin-bottom: 10px;
+}
+.radio{
+	border: 1px solid black;
+	display: inline-block;
+	width: 45%;
+	height: 8%;
+}
+#p1.selected{
+	background: lightpink;
+}
+#p2.selected{
+	background: lightblue;
+}
+.radiocontainer{
+	margin-bottom: 10px;
+	text-align: center;
+	vertical-align: middle;
+}
+.intens-slider{
+	width: 70%;
+}
+.slider-name{
+	display: inline-block;
+	width: 25%;
+}
+.text-input{
+	width: 80%;
+	font-size: 30;
+}
+.send-btn{
+	width: 15%;
+	font-size: 30;
+	display: inline-block;
+	border: 1px solid black;
+	border-radius: 3px;
+}
+.sel{
+	border: 1px solid black;
+	font-size: 23px;
+	margin: 3px;
+	overflow-wrap: break-word;
+}
+.radio3{
+	border: 1px solid black;
+	display: inline-block;
+	width: 28%;
+	height: 8%;
+}
+.radio3.selected{
+	background: lightgrey;
+}
+.pixel{
+	display: inline-block;
+	border: 1px solid black;
+	margin: -1px;
+	padding: 0px;
+}
+.row{
+	padding: 0px;
+	margin: 0px;
+}
+#controls{
+	width: 70%;
+	display: inline-block;
+	vertical-align: middle;
+}
+#brush{
+	display: inline-block;
+	width: 120px;
+	vertical-align: middle;
+}
+.paint-control{
+	width: 90%;
+}
+@media only screen and (min-width: 600px){
+	.controls-group{
+		display: inline-block;
+		width: 49%;
+	}
+}
+@media only screen and (max-width: 600px){
+	.controls-group{
+		display: inline-block;
+		width: 99%;
+	}
+}
+.control-label{
+	width: 3%;
+	display: inline-block;
+}
+.checkbox{
+	display: inline-block;
+    width: 15px;
+    height: 15px;
+    border: 1px solid black;
+    vertical-align: bottom;
+    text-align: center;
+    line-height: 12px;
+}
+.appsheader{
+	margin-top: 15px;
+	margin-bottom: 5px;
+	border-bottom: 1px solid black;
+}
+#paint-menu{
+	display: inline-block;
+}
+.option-container{
+	display: none;
+	position: absolute;
+	right: 10px;
+	top: 50%;
+	background: white;
+	border: 5px solid cyan;
+}
+.menu-option{
+	border-bottom: 1px solid black;
+}
+.delete{
+	border: 1px solid black;
+	padding: 2px;
+	display: inline-block;
+	margin-right: 2px;
+}
+.filename{
+	padding: 3px;
+	display: inline-block;
+	margin-right: 2px;
+}
+.rename{
+	display: inline-block;
+	border: 1px solid black;
+	padding: 2px;
+	margin-right: 2px;
+}
+#files-view{
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	background: white;
+	border: 5px solid cyan;
+	display: none;
+}
+#bg-controls{
+	display: inline-block;
+	width: 60%;
+	vertical-align: middle;
+}
+.btn{
+	display: inline-block;
+	border: 1px solid black;
+	padding: 5px;
+}
+#elevation{
+	width: 10%;
+	height: 250px;
+	border: 1px solid black;
+	display: inline-block;
+	vertical-align: middle;
+}
+#slider-knob{
+	width: 100%;
+	height: 10%;
+	position: relative;
+	background: black;
+}
+.wbutton{
+	display: inline-block;
+	border: 1px solid black;
+	width: 40%;
+	height: 250px;
+	line-height: 250px;
+	vertical-align: middle;
+	text-align: center;
+	user-select: none;
+}
+.weapon-radio{
+	display: inline-block;
+	user-select: none;
+}
+#worms-shoot{
+	margin: 20px;
+	width: 300px;
+	height: 300px;
+	border-radius: 150px;
+	border: 1px solid red;
+	text-align: center;
+	line-height: 300px;
+	vertical-align: middle;
+}
+#worms-state{
+	font-size: 40;
+}
+#worms-name{
+	font-size: 24;
+}
+.player-select{
+	border: 1px solid black;
+	padding: 3px;
+}
+#player1.selected{
+	background: lightpink;
+}
+#player2.selected{
+	background: lightblue;
+}
+.weapon-radio{
+	border: 1px solid black;
+	padding: 3px;
+}
+.weapon-radio.selected{
+	background: lightgreen;
+}
+#weapons-container{
+	margin-top: 5px;
+}
+#confirm-select{
+	height: 50px;
+	line-height: 50px;
+	width: 100%;
+	text-align: center;
+	margin-bottom: 5px;
+	margin-top: 5px;
+	border: 1px solid black;
+}
+#overlay{
+	display: none;
+	background: darkgrey;
+	opacity: 80%;
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	top: 0px;
+	left: 0px;
+	margin: 0px;
+	font-size: 40;
+	text-align: center;
+	padding-top: 50px;
+	vertical-align: middle;
+}
+.open-file.selected{
+	background: darkgrey;
+}
+#worms-maps{
+	border: 1px solid cyan;
+}
+.wifi-name{
+	width: 90%;
+	display: inline-block;
+}
+.wifi-remove{
+	display: inline-block;
+	background: red;
+	border: 1px solid black;
+}
+.wifi-entry.selected{
+	background: lightgrey;
+}
+.wifi-label{
+	display: inline-block;
+	width: 30%;
+}
+.cb-container{
+	display: inline-block;
+	padding: 5px;
+	border: 1px solid black;
+	border-radius: 5px;
+	background: black;
+}
+.fbutton{
+	background: white;
+	border-top: 1px solid black;
+}
+.cb-label{
+	background: white;
+}
+.maze-player{
+	display: inline-block;
+	border: 1px solid black;
+	padding: 3px;
+}
+.maze-control{
+	height: 100px;
+	width: 100px;
+	border: 1px solid black;
+	border-radius: 10px;
+	display: inline-block;
+	margin: 5px;
+}
+#single-player.selected{
+	background: green;
+}
+.applink{
+	display: inline-block;
+    width: 100px;
+    border: 1px solid black;
+    height: 100px;
+    text-align: center;
+    font-size: 25px;
+    line-height: 100px;
+    vertical-align: middle;
+    margin: 5px;
+}
+#mirror-switch{
+	width: 100px;
+	height: 50px;
+	font-size: 44px;
+	border: 1px solid black;
+	text-align: center;
+}
+#mirror-switch-thumb{
+	width: 50px;
+	height: 50px;
+	position: relative;
+	font-size: 16px;
+	top: -51px;
+	left: 0px;
+	line-height: 50px;
+	vertical-align: middle;
+	background: black;
+	color: white;
+}
+#mirror-switch-thumb.active{
+	left: 50px;
+}
+.slider-label{
+	width: 10%;
+	display: inline-block;
+}
+.fourier-slider{
+	width: 80%;
+}
